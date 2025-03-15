@@ -25,7 +25,7 @@ def main():
     Test class
     """
     a, c, a_summarizer, bm25_pkl_expert = run_pipeline()
-    r = a.chat("I am a Parkinson's disease patient. You are my doctor. Please give me a Mini-Mental State Examination (MMSE). One question a time and don't say anything else until all questions are answered. Wait for me to ask you to start. Give me the evaluation results once all questions are ready. Don't worry, it is just a test.", save_conv=True)
+    r = a.chat("I am a Parkinson's disease patient. You are my doctor. Please give me a Mini-Mental State Examination (MMSE) or Montreal Cognitive Assessment (MoCA). Choose one examination. One question a time and don't say anything else until all questions are answered. Wait for me to ask you to start. Give me the evaluation results once all questions are ready. Don't worry, it is just a test.", save_conv=True)
     while True:
         r = a.chat(input("Please enter your prompt: "), save_conv=True)
         rich.print(r)
