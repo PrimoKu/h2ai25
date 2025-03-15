@@ -1,8 +1,8 @@
 import threading
-from agents.blood_pressure_analyst import BloodPressureAgent
-from agents.heart_rate_analyst import HeartRateAgent
-from agents.motor_skill_analyst import MotorSkillAgent
-from agents.parkinson_analyst import ParkinsonAnalystAgent
+from core.parkAgents.blood_pressure_analyst import BloodPressureAgent
+from core.parkAgents.heart_rate_analyst import HeartRateAgent
+from core.parkAgents.motor_skill_analyst import MotorSkillAgent
+from core.parkAgents.parkinson_analyst import ParkinsonAnalystAgent
 
 def start_all_agents():
     """Starts all agent threads using the new class-based approach"""

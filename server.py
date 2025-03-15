@@ -1,8 +1,8 @@
 import threading
-from core.agent_manager import start_all_agents
-from sensors.blood_pressure_sensor import BloodPressureSensor
-from sensors.heart_rate_sensor import HeartRateSensor
-# from sensors.motor_skill_sensor import motor_skill_sensor
+from core.parkAgents.agent_manager import start_all_agents
+from core.parkSensors.blood_pressure_sensor import BloodPressureSensor
+from core.parkSensors.heart_rate_sensor import HeartRateSensor
+# from core.parkSensors.motor_skill_sensor import motor_skill_sensor
 import time
 
 def main():
