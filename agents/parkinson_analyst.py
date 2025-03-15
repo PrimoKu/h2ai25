@@ -118,6 +118,3 @@ def run_parkinson_agent():
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-parkinson_agent_thread = threading.Thread(target=run_parkinson_agent, daemon=True)
-parkinson_agent_thread.start()

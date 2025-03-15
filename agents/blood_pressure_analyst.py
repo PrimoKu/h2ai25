@@ -83,6 +83,3 @@ def run_bp_agent():
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-bp_agent_thread = threading.Thread(target=run_bp_agent, daemon=True)
-bp_agent_thread.start()

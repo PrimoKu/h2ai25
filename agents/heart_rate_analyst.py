@@ -83,6 +83,3 @@ def run_hr_agent():
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-hr_agent_thread = threading.Thread(target=run_hr_agent, daemon=True)
-hr_agent_thread.start()

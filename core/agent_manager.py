@@ -17,5 +17,3 @@ def start_all_agents():
     
     for thread in threads:
         thread.start()
-
-start_all_agents()

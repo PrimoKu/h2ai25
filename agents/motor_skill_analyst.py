@@ -77,13 +77,10 @@ motor_skill_agent = initialize_agent(
     verbose=True
 )
 
-def run_motor_skill_agent():
+def run_ms_agent():
     """Schedules analysis every minute."""
     schedule.every(1).minutes.do(lambda: threading.Thread(target=motor_skill_agent.run, args=("Analyze the latest data.",)).start())
 
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-motor_skill_agent_thread = threading.Thread(target=run_motor_skill_agent, daemon=True)
-motor_skill_agent_thread.start()
