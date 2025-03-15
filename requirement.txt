@@ -9,4 +9,5 @@ soundfile
 scipy
 librosa
 wave 
-
+SpeechRecognition
+pocketsphinx
