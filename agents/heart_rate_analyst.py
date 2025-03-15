@@ -6,13 +6,15 @@ import schedule
 import time
 from datetime import datetime, timedelta
 from langchain.chat_models import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+from langchain.tools import Tool
 import config
 
 # Initialize OpenAI model
 llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=config.OPENAI_API_KEY)
 
 def get_data_from_last_minute():
-    """Fetches heart rate data from one minute ago."""
+    """Fetches last minute's heart rate data."""
     if not os.path.exists(config.HEART_RATE_CSV):
         return []
     
@@ -59,9 +61,24 @@ def analyze_heart_rate():
 
     print(f"[Heart Rate Agent] Analysis saved.")
 
+# Define the tool for the agent
+hr_analysis_tool = Tool(
+    name="Heart Rate Analysis",
+    func=analyze_heart_rate,
+    description="You are a heart health expert. Your role is to examine the user's heart rate readings from the last minute, detect irregularities, assess overall heart health, and offer recommendations if needed."
+)
+
+# Initialize the agent
+hr_agent = initialize_agent(
+    tools=[hr_analysis_tool],
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
 def run_hr_agent():
-    """Schedules analysis every minute without skipping."""
-    schedule.every(1).minutes.do(lambda: threading.Thread(target=analyze_heart_rate).start())
+    """Schedules analysis every minute."""
+    schedule.every(1).minutes.do(lambda: threading.Thread(target=hr_agent.run, args=("Analyze the latest data.",)).start())
 
     while True:
         schedule.run_pending()

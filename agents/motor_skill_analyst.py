@@ -6,13 +6,15 @@ import schedule
 import time
 from datetime import datetime, timedelta
 from langchain.chat_models import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+from langchain.tools import Tool
 import config
 
 # Initialize OpenAI model
 llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=config.OPENAI_API_KEY)
 
 def get_data_from_last_minute():
-    """Fetches motor skill data from one minute ago."""
+    """Fetches last minute's motor skill data."""
     if not os.path.exists(config.MOTOR_SKILLS_CSV):
         return []
     
@@ -59,13 +61,29 @@ def analyze_motor_skills():
 
     print(f"[Motor Skill Agent] Analysis saved.")
 
-def run_ms_agent():
-    """Schedules analysis every minute without skipping."""
-    schedule.every(1).minutes.do(lambda: threading.Thread(target=analyze_motor_skills).start())
+# Define the tool for the agent
+motor_skill_analysis_tool = Tool(
+    name="Motor Skill Analysis",
+    func=analyze_motor_skills,
+    description="You are a neurological and motor function analyst. Your job is to evaluate the user's grip strength and coordination based on last-minute data. Detect any signs of motor impairment, fatigue, or potential neurological disorders."
+)
+
+
+# Initialize the agent
+motor_skill_agent = initialize_agent(
+    tools=[motor_skill_analysis_tool],
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+def run_motor_skill_agent():
+    """Schedules analysis every minute."""
+    schedule.every(1).minutes.do(lambda: threading.Thread(target=motor_skill_agent.run, args=("Analyze the latest data.",)).start())
 
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-ms_agent_thread = threading.Thread(target=run_ms_agent, daemon=True)
-ms_agent_thread.start()
+motor_skill_agent_thread = threading.Thread(target=run_motor_skill_agent, daemon=True)
+motor_skill_agent_thread.start()
