@@ -4,25 +4,38 @@ from core.parkAgents.heart_rate_analyst import HeartRateAgent
 from core.parkAgents.motor_skill_analyst import MotorSkillAgent
 from core.parkAgents.parkinson_analyst import ParkinsonAnalystAgent
 
+# Global agent instances to ensure they are only created once
+_agent_instances = {
+    'bp_agent': None,
+    'hr_agent': None,
+    'ms_agent': None,
+    'pk_agent': None
+}
+
 def start_all_agents():
-    """Starts all agent threads using the new class-based approach"""
+    """Starts all agent threads using the singleton approach to prevent duplicate instances"""
     
-    # Initialize all agents
-    bp_agent = BloodPressureAgent()
-    hr_agent = HeartRateAgent()
-    ms_agent = MotorSkillAgent()
-    pk_agent = ParkinsonAnalystAgent()
+    # Initialize agents only if they don't exist yet
+    if _agent_instances['bp_agent'] is None:
+        _agent_instances['bp_agent'] = BloodPressureAgent()
+        _agent_instances['hr_agent'] = HeartRateAgent()
+        _agent_instances['ms_agent'] = MotorSkillAgent()
+        _agent_instances['pk_agent'] = ParkinsonAnalystAgent()
     
-    # Create threads for each agent's run method
-    threads = [
-        threading.Thread(target=bp_agent.run, daemon=True),
-        threading.Thread(target=hr_agent.run, daemon=True),
-        threading.Thread(target=ms_agent.run, daemon=True),
-        threading.Thread(target=pk_agent.run, daemon=True),
-    ]
-    
-    # Start all threads
-    for thread in threads:
-        thread.start()
-    
-    return threads
+        # Create threads for each agent's run method
+        threads = [
+            threading.Thread(target=_agent_instances['bp_agent'].run, daemon=True),
+            threading.Thread(target=_agent_instances['hr_agent'].run, daemon=True),
+            threading.Thread(target=_agent_instances['ms_agent'].run, daemon=True),
+            threading.Thread(target=_agent_instances['pk_agent'].run, daemon=True),
+        ]
+        
+        # Start all threads
+        for thread in threads:
+            thread.start()
+        
+        print("All agent threads started successfully.")
+        return threads
+    else:
+        print("Agents already running, no new threads started.")
+        return []
