@@ -1,0 +1,12 @@
+pyaudio
+numpy
+torch
+torchvision
+torchaudio
+transformers
+huggingface-hub
+soundfile
+scipy
+librosa
+wave 
+
