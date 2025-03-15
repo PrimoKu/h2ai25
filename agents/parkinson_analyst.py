@@ -5,8 +5,11 @@ import schedule
 import time
 from datetime import datetime
 from langchain.chat_models import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+from langchain.tools import Tool
 import config
 
+# Initialize OpenAI model
 llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=config.OPENAI_API_KEY)
 
 def read_latest_entry(file_path):
@@ -51,10 +54,12 @@ def analyze_parkinson():
 
     # Construct analysis prompt
     prompt = (
-        f"Analyze the following patient data for Parkinson's disease symptoms:\n"
+        f"You are a Parkinson’s disease analyst. Your task is to analyze the following patient data and "
+        f"identify potential symptoms or warning signs of Parkinson’s disease:\n\n"
         f"Blood Pressure Analysis: {bp_data['analysis']}\n"
         f"Heart Rate Analysis: {hr_data['analysis']}\n"
-        f"Motor Skills Analysis: {ms_data['analysis']}"
+        f"Motor Skills Analysis: {ms_data['analysis']}\n\n"
+        f"Based on these readings, provide a detailed assessment of whether there are any Parkinson’s indicators."
     )
 
     # Perform AI-based analysis
@@ -70,7 +75,6 @@ def analyze_parkinson():
     }
 
     # Save analysis to JSON file
-    result_file = config.DATA_STORAGE_PATH + "parkinson_analysis.json"
     previous_results = []
     
     if os.path.exists(config.ANALYZED_PARKINSON_JSON):
@@ -87,14 +91,29 @@ def analyze_parkinson():
 
     print(f"[Parkinson Agent] Analysis saved.")
 
+# Define the tool for the agent
+parkinson_analysis_tool = Tool(
+    name="Parkinson's Disease Analysis",
+    func=analyze_parkinson,
+    description="You are a Parkinson’s disease analyst. Your job is to evaluate recent blood pressure, heart rate, and motor skill data to detect possible symptoms of Parkinson’s disease. Analyze the data and provide an expert assessment."
+)
+
+# Initialize the agent
+parkinson_agent = initialize_agent(
+    tools=[parkinson_analysis_tool],
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
 def run_parkinson_agent():
-    """Schedules Parkinson analysis every minute without overlapping."""
+    """Schedules Parkinson analysis every minute."""
     while not check_all_data_available():
         print("[Parkinson Agent] Waiting for data... Checking again in 10 seconds.")
         time.sleep(10)  # Retry in 10 seconds if data is missing
 
     print("[Parkinson Agent] Data available. Starting analysis every minute.")
-    schedule.every(1).minutes.do(analyze_parkinson)
+    schedule.every(1).minutes.do(lambda: threading.Thread(target=parkinson_agent.run, args=("Analyze the latest data.",)).start())
 
     while True:
         schedule.run_pending()
