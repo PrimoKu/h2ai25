@@ -25,7 +25,7 @@ class h2aiOpenAIClient:
                     "content": msg
                 }
             ], 
-            model="gpt-4-turbo",
+            model="gpt-4o",
             temperature=0.8,
             max_tokens=256
         )
