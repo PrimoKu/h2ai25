@@ -1,19 +1,28 @@
 import threading
-from agents.mood_analyst import run_mood_agent
-from agents.blood_pressure_analyst import run_bp_agent
-from agents.heart_rate_analyst import run_hr_agent
-from agents.motor_skill_analyst import run_ms_agent
-from agents.parkinson_analyst import run_parkinson_agent
+from agents.blood_pressure_analyst import BloodPressureAgent
+from agents.heart_rate_analyst import HeartRateAgent
+from agents.motor_skill_analyst import MotorSkillAgent
+from agents.parkinson_analyst import ParkinsonAnalystAgent
 
 def start_all_agents():
-    """Starts all agent threads"""
+    """Starts all agent threads using the new class-based approach"""
+    
+    # Initialize all agents
+    bp_agent = BloodPressureAgent()
+    hr_agent = HeartRateAgent()
+    ms_agent = MotorSkillAgent()
+    pk_agent = ParkinsonAnalystAgent()
+    
+    # Create threads for each agent's run method
     threads = [
-        threading.Thread(target=run_mood_agent, daemon=True),
-        threading.Thread(target=run_bp_agent, daemon=True),
-        threading.Thread(target=run_hr_agent, daemon=True),
-        threading.Thread(target=run_ms_agent, daemon=True),
-        threading.Thread(target=run_parkinson_agent, daemon=True),
+        threading.Thread(target=bp_agent.run, daemon=True),
+        threading.Thread(target=hr_agent.run, daemon=True),
+        threading.Thread(target=ms_agent.run, daemon=True),
+        threading.Thread(target=pk_agent.run, daemon=True),
     ]
     
+    # Start all threads
     for thread in threads:
         thread.start()
+    
+    return threads
