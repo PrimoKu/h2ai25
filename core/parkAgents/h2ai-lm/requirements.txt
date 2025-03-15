@@ -1,0 +1,17 @@
+numpy
+scipy
+tqdm
+more-itertools
+jaxtyping 
+kaggle 
+rich
+python-dotenv
+openai
+tiktoken
+rank_bm25
+torch
+torchvision
+torchaudio
+nltk
+rank-bm25
+numpy
