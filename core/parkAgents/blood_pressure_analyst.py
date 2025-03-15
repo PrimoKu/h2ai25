@@ -2,7 +2,6 @@ import json
 import csv
 import threading
 import os
-import schedule
 import time
 from datetime import datetime, timedelta
 from langchain.prompts import ChatPromptTemplate
@@ -14,6 +13,9 @@ class BloodPressureAgent:
     def __init__(self, model="gpt-4", temperature=0, api_key=None):
         self.api_key = api_key or config.OPENAI_API_KEY
         self.model = ChatOpenAI(model=model, temperature=temperature, api_key=self.api_key)
+        self.file_lock = threading.Lock()  # Lock for thread-safe file operations
+        self._last_analysis_time = None    # Track when we last did an analysis
+        self._running = False              # Flag to prevent multiple analyses at once
         
         # Define the cardiovascular expert persona
         self.persona = """You are a medical assistant specializing in cardiovascular health with extensive experience in blood pressure monitoring and analysis. 
@@ -65,34 +67,44 @@ class BloodPressureAgent:
         return relevant_data
     
     def save_analysis_results(self, analysis):
-        """Saves analysis results to JSON file."""
-        result_data = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "analysis": analysis
-        }
+        """Saves analysis results to JSON file with thread safety."""
+        with self.file_lock:  # Ensure only one thread writes at a time
+            result_data = {
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "analysis": analysis
+            }
 
-        previous_results = []
-        if os.path.exists(config.ANALYZED_BLOOD_PRESSURE_JSON):
-            with open(config.ANALYZED_BLOOD_PRESSURE_JSON, "r") as f:
-                try:
-                    previous_results = json.load(f)
-                except json.JSONDecodeError:
-                    pass
+            previous_results = []
+            if os.path.exists(config.ANALYZED_BLOOD_PRESSURE_JSON):
+                with open(config.ANALYZED_BLOOD_PRESSURE_JSON, "r") as f:
+                    try:
+                        previous_results = json.load(f)
+                    except json.JSONDecodeError:
+                        pass
 
-        previous_results.append(result_data)
+            previous_results.append(result_data)
 
-        with open(config.ANALYZED_BLOOD_PRESSURE_JSON, "w") as f:
-            json.dump(previous_results, f, indent=4)
+            with open(config.ANALYZED_BLOOD_PRESSURE_JSON, "w") as f:
+                json.dump(previous_results, f, indent=4)
 
-        print(f"[Blood Pressure Agent] Analysis saved.")
+            timestamp = result_data['timestamp']
+            print(f"[Blood Pressure Agent] Analysis saved at {timestamp}.")
     
     def analyze(self):
         """Runs the blood pressure analysis."""
+        # Set running flag to prevent multiple concurrent analyses
+        if self._running:
+            print("[Blood Pressure Agent] Analysis already in progress, skipping.")
+            return
+            
+        self._running = True
+        
         try:
             # Get latest data
             data = self.get_data_from_last_minute()
             if not data:
                 print("[Blood Pressure Agent] No data available for analysis.")
+                self._running = False
                 return
             
             # Create a detailed prompt for analysis
@@ -111,16 +123,29 @@ class BloodPressureAgent:
             # Save results
             self.save_analysis_results(analysis)
             
+            # Update last analysis time
+            self._last_analysis_time = datetime.now()
             print(f"[Blood Pressure Agent] Completed analysis.")
             
         except Exception as e:
             print(f"[Blood Pressure Agent] Error during analysis: {str(e)}")
+        finally:
+            # Always reset running flag when done
+            self._running = False
     
     def run(self):
-        """Schedules analysis every minute."""
-        schedule.every(1).minutes.do(lambda: threading.Thread(target=self.analyze).start())
-
+        """Runs the analysis loop with proper timing."""
         print("[Blood Pressure Agent] Started monitoring. Will analyze data every minute.")
+        
         while True:
-            schedule.run_pending()
-            time.sleep(1)
+            current_time = datetime.now()
+            
+            # If it's the first run or at least 1 minute has passed since last analysis
+            if (self._last_analysis_time is None or 
+                (current_time - self._last_analysis_time).total_seconds() >= 30):
+                
+                # Start analysis in a separate thread to not block the main loop
+                threading.Thread(target=self.analyze, daemon=True).start()
+                
+            # Sleep for a short time before checking again
+            time.sleep(10)  # Check every 10 seconds instead of blocking for a full minute
