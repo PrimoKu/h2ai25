@@ -3,13 +3,15 @@ from core.parkAgents.blood_pressure_analyst import BloodPressureAgent
 from core.parkAgents.heart_rate_analyst import HeartRateAgent
 from core.parkAgents.motor_skill_analyst import MotorSkillAgent
 from core.parkAgents.parkinson_analyst import ParkinsonAnalystAgent
+from core.parkAgents.speech_analyst import SpeechAnalystAgent
 
 # Global agent instances to ensure they are only created once
 _agent_instances = {
     'bp_agent': None,
     'hr_agent': None,
     'ms_agent': None,
-    'pk_agent': None
+    'pk_agent': None,
+    'sp_agent': None
 }
 
 def start_all_agents():
@@ -21,6 +23,7 @@ def start_all_agents():
         _agent_instances['hr_agent'] = HeartRateAgent()
         _agent_instances['ms_agent'] = MotorSkillAgent()
         _agent_instances['pk_agent'] = ParkinsonAnalystAgent()
+        _agent_instances['sp_agent'] = SpeechAnalystAgent()
     
         # Create threads for each agent's run method
         threads = [
@@ -28,6 +31,7 @@ def start_all_agents():
             threading.Thread(target=_agent_instances['hr_agent'].run, daemon=True),
             threading.Thread(target=_agent_instances['ms_agent'].run, daemon=True),
             threading.Thread(target=_agent_instances['pk_agent'].run, daemon=True),
+            threading.Thread(target=_agent_instances['sp_agent'].run, daemon=True),
         ]
         
         # Start all threads
