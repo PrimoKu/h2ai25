@@ -30,6 +30,9 @@ def main():
     run_external_script("core/parkCam/monitoring/gait.py")
     run_external_script("core/parkCam/monitoring/tremor.py")
     run_external_script("core/parkCam/monitoring/posture.py")
+
+    print("Starting cognitive agent...")
+    run_external_script("cognitive_assessment.py")
     
     time.sleep(5)
 
