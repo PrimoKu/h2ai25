@@ -729,6 +729,28 @@
         from { transform: translateY(-20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
     }
+    .analysis-context {
+      margin: 15px 0;
+    }
+
+    .analysis-context label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #003366;
+    }
+
+    #analysisContext {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 
@@ -766,10 +788,27 @@
     let hotInstance = null;
     let currentCSVData = {};
     let dynamicChart;
+    window.currentAnalyses = [];
     // Simulate streaming data (replace with actual ZeroMQ integration)
     let medicineTaken = false; // Track if medicine has been taken
     let medicineTime = null; // Track the time when medicine was taken
+    const analysisIndexMap = {
+      'heart_rate': 0,
+      'blood_pressure': 1,
+      'motor_skill': 2,
+      'speech': 3
+    };
 
+    // Add this function to handle analysis updates
+    function updateAnalysisContext() {
+      const activeTab = $('.csv-tab.active');
+      if (!activeTab.length || !window.currentAnalyses) return;
+
+      const csvName = activeTab.data('csv');
+      const index = analysisIndexMap[csvName];
+      const analysisText = window.currentAnalyses[index] || 'No analysis available';
+      $('#analysisContext').val(analysisText);
+    }
     // Function to simulate medicine intake
     function simulateMedicineIntake() {
       const delay = Math.floor(Math.random() * 20000) + 10000; // Random delay between 10-30 seconds
@@ -915,7 +954,6 @@
       const mergedMap = new Map();
 
       dataArrays.forEach((data, index) => {
-        // First group each dataset by minute
         const minuteMap = new Map();
         data.forEach(item => {
           const timestamp = new Date(item.timestamp);
@@ -927,29 +965,24 @@
             timestamp.getMinutes()
           ).getTime();
 
-          // Keep last entry in each minute
           minuteMap.set(minuteKey, item);
         });
 
-        // Process grouped data
         Array.from(minuteMap.entries()).forEach(([minuteKey, item]) => {
           if (!mergedMap.has(minuteKey)) {
             mergedMap.set(minuteKey, {
               timestamp: new Date(minuteKey),
-              alerts: [false, false, false],
-              analyses: ['', '', '']
+              alerts: [false, false, false, false], // 4 alerts
+              analyses: ['', '', '', ''] // 4 analyses
             });
           }
           const entry = mergedMap.get(minuteKey);
           entry.alerts[index] = (item.alert === true || item.alert === "true");
-          console.log(`Minute ${minuteKey}: Set alert[${index}] to`, entry.alerts[index]);
-          entry.analyses[index] = item.analysis;
+          entry.analyses[index] = item.analysis || ''; // Handle missing analysis
         });
       });
 
-      return Array.from(mergedMap.values()).sort((a, b) =>
-        b.timestamp - a.timestamp
-      );
+      return Array.from(mergedMap.values()).sort((a, b) => b.timestamp - a.timestamp);
     }
 
   function renderMeasurements(data, filterParams = {}) {
@@ -1001,6 +1034,8 @@
           $('.measurement-item').removeClass('selected');
           $(this).addClass('selected');
 
+          window.currentAnalyses = item.analyses;
+
           $('#reportsDefault').hide();
           $('#csvViewer').show();
 
@@ -1017,7 +1052,7 @@
               loadCSV('speech', timestamp),
               loadCSV('motor_skill', timestamp)
             ]);
-
+            updateAnalysisContext();
             // Check for any successful loads
             const hasValidData = loadResults.some(result => result.value);
             if (!hasValidData) throw new Error('All CSV loads failed');
@@ -1030,6 +1065,7 @@
             console.error('Error loading CSVs:', error);
             $('#hot-container').html(`<div class="error">Error loading data: ${error.message}</div>`);
           }
+          updateAnalysisContext();
         });
       });
     }
@@ -1245,6 +1281,10 @@
             <i class="fas fa-walking"></i> Motor
           </button>
         </div>
+        <div class="analysis-context">
+          <label>AI Analysis Context:</label>
+          <textarea id="analysisContext" readonly></textarea>
+        </div>
         <div id="hot-container" style="height: calc(100% - 60px); margin-top: 15px;"></div>
       </div>
     </div>
@@ -1336,6 +1376,7 @@
         $('.csv-tab').removeClass('active');
         $(this).addClass('active');
         showCSVData(csvName);
+        updateAnalysisContext();
       });
 
       // Update loadPatientData function
