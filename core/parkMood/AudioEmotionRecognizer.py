@@ -2,6 +2,9 @@ import pyaudio
 import numpy as np
 import time
 import torch
+import os
+import csv
+import datetime
 from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
 from scipy.signal import butter, filtfilt  # for filtering
 
@@ -9,6 +12,8 @@ class AudioEmotionRecognizer:
     def __init__(self, config):
         self.config = config
         self.p = pyaudio.PyAudio()
+        import os
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
         self.feature_extractor = AutoFeatureExtractor.from_pretrained(config["model_name"])
         self.model = AutoModelForAudioClassification.from_pretrained(config["model_name"])
         self.device_index = config["device_index"]
@@ -16,6 +21,36 @@ class AudioEmotionRecognizer:
         self.recording = False
         self.frames = []
         self.silence_start = None
+        self.csv_path = config["csv_path"]
+        
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(self.csv_path), exist_ok=True)
+        
+        # Check if the CSV file exists, if not create it with headers
+        self._initialize_csv()
+
+    def _initialize_csv(self):
+        """Initialize the CSV file with headers if it doesn't exist"""
+        if not os.path.exists(self.csv_path):
+            with open(self.csv_path, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow([
+                    'timestamp', 
+                    'Fundamental Frequency(Hz)', 
+                    'Jitter(%)', 
+                    'Shimmer(%)', 
+                    'Volumn(RMS)', 
+                    'Volumn Status',
+                    'neutral(%)',
+                    'calm(%)',
+                    'happy(%)',
+                    'sad(%)',
+                    'angry(%)',
+                    'fearful(%)', 
+                    'disgust(%)',
+                    'surprised(%)'
+                ])
+            print(f"Created new CSV file at {self.csv_path}")
 
     def _initialize_audio_stream(self):
         return self.p.open(
@@ -133,7 +168,15 @@ class AudioEmotionRecognizer:
         volume = np.sqrt(np.mean(filtered_waveform ** 2))
         # Compare volume against a threshold to flag reduced volume
         reduced_volume = volume < self.config.get("volume_threshold", 0.02)
-        return {"Fo": Fo, "Jitter": jitter, "Shimmer": shimmer, "Volume": volume, "ReducedVolume": reduced_volume}
+        volume_status = "Reduced" if reduced_volume else "Normal"
+        
+        return {
+            "Fo": Fo, 
+            "Jitter": jitter, 
+            "Shimmer": shimmer, 
+            "Volume": volume, 
+            "VolumeStatus": volume_status
+        }
 
     def _analyze_audio(self):
         print("\nSilence detected for 2 seconds, stop recording and processing...")
@@ -156,10 +199,7 @@ class AudioEmotionRecognizer:
         else:
             print("Shimmer: N/A")
         print(f"Volume (RMS): {voice_features['Volume']:.4f}")
-        if voice_features["ReducedVolume"]:
-            print("Volume Status: Reduced (possible hypophonia)")
-        else:
-            print("Volume Status: Normal")
+        print(f"Volume Status: {voice_features['VolumeStatus']}")
 
         # Then run mood/emotion detection
         waveform_tensor = torch.from_numpy(waveform)
@@ -170,12 +210,60 @@ class AudioEmotionRecognizer:
             probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)
         predicted_class_idx = torch.argmax(probabilities, dim=-1).item()
         predicted_emotion = self.model.config.id2label[predicted_class_idx]
+        
         print("\n--- Mood Detection ---")
         print(f"Predicted Emotion: {predicted_emotion}")
         print("Scores:")
+        
+        # Get all emotion scores
         scores = probabilities[0].tolist()
+        emotion_scores = {}
         for idx, label in sorted(self.model.config.id2label.items()):
-            print(f"  {label}: {scores[idx]:.4f}")
+            # Store raw probability scores (0-1)
+            emotion_scores[label] = scores[idx]
+            # Display as percentage for user-friendly output
+            print(f"  {label}: {scores[idx] * 100:.2f}%")
+            
+        # Save data to CSV
+        self._save_to_csv(voice_features, emotion_scores)
+
+    def _save_to_csv(self, voice_features, emotion_scores):
+        """Save the analysis results to CSV file"""
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Normalize Jitter and Shimmer from percentage (0-100) to 0-1 range
+        jitter_normalized = voice_features["Jitter"] / 100 if voice_features["Jitter"] is not None else ""
+        shimmer_normalized = voice_features["Shimmer"] / 100 if voice_features["Shimmer"] is not None else ""
+        
+        # Normalize emotion scores from percentage (0-100) to 0-1 range
+        normalized_emotions = {emotion: score for emotion, score in emotion_scores.items()}
+        
+        # Prepare the row data
+        row_data = [
+            timestamp,
+            voice_features["Fo"] if voice_features["Fo"] is not None else "",
+            jitter_normalized,
+            shimmer_normalized,
+            voice_features["Volume"],  # Already in 0-1 range
+            voice_features["VolumeStatus"],
+            normalized_emotions.get("neutral", 0),
+            normalized_emotions.get("calm", 0),
+            normalized_emotions.get("happy", 0),
+            normalized_emotions.get("sad", 0),
+            normalized_emotions.get("angry", 0),
+            normalized_emotions.get("fearful", 0),
+            normalized_emotions.get("disgust", 0),
+            normalized_emotions.get("surprised", 0)
+        ]
+        
+        # Append to CSV
+        try:
+            with open(self.csv_path, 'a', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(row_data)
+            print(f"\nResults saved to {self.csv_path}")
+        except Exception as e:
+            print(f"Error saving to CSV: {e}")
 
     def _reset(self):
         self.recording = False
@@ -198,7 +286,8 @@ if __name__ == "__main__":
         "threshold": 400,         # amplitude threshold for speech detection
         "silence_duration": 2.0,
         "volume_threshold": 0.02,  # RMS threshold below which volume is considered reduced
-        "device_index": 10,         # Change as needed
+        "device_index": None,      # Change as needed
+        "csv_path": "./web_app/data_storage/speech.csv"  # Path to save CSV data
     }
     
     recognizer = AudioEmotionRecognizer(config)
