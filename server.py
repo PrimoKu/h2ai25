@@ -1,9 +1,19 @@
 import threading
+
 from core.parkAgents.agent_manager import start_all_agents
 from core.parkSensors.blood_pressure_sensor import BloodPressureSensor
 from core.parkSensors.heart_rate_sensor import HeartRateSensor
-# from core.parkSensors.motor_skill_sensor import motor_skill_sensor
+
+# from core.parkCam.monitoring.gait import parkCamGait
+# from core.parkCam.monitoring.posture import parkCamPosture
+# from core.parkCam.monitoring.tremor import parkCamTremor
+
+import subprocess
 import time
+
+def run_external_script(path):
+    """Runs an external Python script without blocking the main program."""
+    subprocess.Popen(["python", path])  # Runs script in a new process
 
 def main():
     print("Starting multi-agent system...")
@@ -15,6 +25,11 @@ def main():
     
     bp_sensor.start()
     hr_sensor.start()
+
+    print("Starting motor function monitoring...")
+    run_external_script("core/parkCam/monitoring/gait.py")
+    run_external_script("core/parkCam/monitoring/tremor.py")
+    run_external_script("core/parkCam/monitoring/posture.py")
     
     time.sleep(5)
 
