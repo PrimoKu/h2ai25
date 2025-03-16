@@ -8,18 +8,18 @@ import time
 import os
 
 class parkCamTremor:
-    def __init__(self, tremor_duration=30, camera_index=0,
+    def __init__(self, save_interval=30, camera_index=0,
                  detection_confidence=0.5, tracking_confidence=0.5,
                  data_dir="data_storage/tremor_data"):
         """
         Parameters:
-          tremor_duration: Test duration in seconds.
+          save_interval: Duration (in seconds) for saving data to CSV.
           camera_index: Which video capture device to use.
           detection_confidence: Minimum detection confidence for MediaPipe.
           tracking_confidence: Minimum tracking confidence for MediaPipe.
           data_dir: Directory where CSV and plot files will be saved.
         """
-        self.tremor_duration = tremor_duration
+        self.save_interval = save_interval
         self.camera_index = camera_index
         self.detection_confidence = detection_confidence
         self.tracking_confidence = tracking_confidence
@@ -29,7 +29,7 @@ class parkCamTremor:
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
-        # Initialize MediaPipe Hands model and drawing utilities
+        # Initialize MediaPipe Hands model
         self.mp_hands = mp.solutions.hands
         self.hands_model = self.mp_hands.Hands(
             min_detection_confidence=self.detection_confidence,
@@ -42,9 +42,12 @@ class parkCamTremor:
         self.time_stamps = {"left": [], "right": []}
 
     def run(self):
-        """Run the resting tremor test for the specified duration."""
+        """Continuously runs the tremor detection and saves data every 'save_interval' seconds."""
         cap = cv2.VideoCapture(self.camera_index)
         start_time = time.time()
+        last_save_time = start_time
+
+        print("Press 'q' to exit.")
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -53,8 +56,6 @@ class parkCamTremor:
 
             current_time = time.time()
             elapsed_time = current_time - start_time
-            if elapsed_time > self.tremor_duration:
-                break
 
             # Process frame for MediaPipe Hands
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -78,26 +79,27 @@ class parkCamTremor:
                     cv2.circle(frame, (wrist_x, wrist_y), 5, (0, 0, 255), -1)
 
             # Overlay elapsed time and instruction text
-            cv2.putText(frame, f"Time: {elapsed_time:.1f}s / {self.tremor_duration}s", (20, 50),
+            cv2.putText(frame, f"Running for: {elapsed_time:.1f}s", (20, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
             cv2.putText(frame, "Keep hands at rest", (20, 90),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
             cv2.imshow("Resting Tremor Detection", frame)
 
+            # Save data every 'save_interval' seconds
+            if current_time - last_save_time >= self.save_interval:
+                self.process_and_save()
+                last_save_time = current_time  # Update last save time
+
+            # Press 'q' to exit
             if cv2.waitKey(1) & 0xFF == ord('q'):
+                print("Stopping tremor detection.")
                 break
 
         cap.release()
         cv2.destroyAllWindows()
 
     def compute_metrics(self):
-        """
-        Process the collected wrist positions to compute tremor metrics.
-        Returns:
-          tremor_data: Dictionary with average frequency, amplitude, and tremor index for each hand.
-          csv_data: Tuple of lists for CSV output (times, hand labels, frequencies, amplitudes).
-          asymmetry_score: Absolute frequency difference between left and right hands (if both exist).
-        """
+        """Computes tremor metrics based on collected wrist data."""
         tremor_data = {}
         tremor_amplitudes_all = []
         tremor_frequencies_all = []
@@ -133,81 +135,63 @@ class parkCamTremor:
                     "tremor_index": tremor_index
                 }
 
-        asymmetry_score = None
-        if "left" in tremor_data and "right" in tremor_data:
-            asymmetry_score = abs(tremor_data["left"]["frequency"] - tremor_data["right"]["frequency"])
-
-        return tremor_data, (times_all, hands_all, tremor_frequencies_all, tremor_amplitudes_all), asymmetry_score
+        return tremor_data, (times_all, hands_all, tremor_frequencies_all, tremor_amplitudes_all)
 
     def process_and_save(self):
-        """
-        Computes tremor metrics, saves the data to a CSV file (within the data folder),
-        and plots the tremor frequency, amplitude, and asymmetry.
-        """
-        tremor_data, csv_data, asymmetry_score = self.compute_metrics()
+        """Computes tremor metrics, saves the data to CSV, and plots tremor frequency and amplitude."""
+        tremor_data, csv_data = self.compute_metrics()
         times_all, hands_all, tremor_frequencies_all, tremor_amplitudes_all = csv_data
 
-        # Save the collected data to CSV in the specified data folder
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        csv_filename = os.path.join(self.data_dir, f"resting_tremor_data_{timestamp}.csv")
+        # Save the collected data to CSV
+        csv_filename = os.path.join(self.data_dir, "resting_tremor_data.csv")
         df = pd.DataFrame({
             "Time (s)": times_all,
             "Hand": hands_all,
             "Tremor Frequency (Hz)": tremor_frequencies_all,
             "Tremor Amplitude (px)": tremor_amplitudes_all
         })
-        df.to_csv(csv_filename, index=False)
+        write_header = not os.path.exists(csv_filename)
+        df.to_csv(csv_filename, mode="a", index=False, header=write_header)
         print(f"Data saved to {csv_filename}")
 
         # Plot the tremor metrics if data exists
-        plt.figure(figsize=(12, 5))
+        if tremor_data:
+            plt.figure(figsize=(12, 5))
+            
+            # Generate timestamp for filenames
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-        # Tremor Frequency Plot
-        if "left" in tremor_data or "right" in tremor_data:
-            labels, freqs = [], []
-            if "left" in tremor_data:
-                labels.append("Left Hand")
-                freqs.append(tremor_data["left"]["frequency"])
-            if "right" in tremor_data:
-                labels.append("Right Hand")
-                freqs.append(tremor_data["right"]["frequency"])
-            plt.subplot(1, 3, 1)
+            # Tremor Frequency Plot
+            labels = list(tremor_data.keys())
+            freqs = [tremor_data[hand]["frequency"] for hand in labels]
+            plt.subplot(1, 2, 1)
             plt.bar(labels, freqs, color=['blue', 'orange'])
             plt.ylabel("Frequency (Hz)")
             plt.title("Tremor Frequency")
 
-        # Tremor Amplitude Plot
-        if "left" in tremor_data or "right" in tremor_data:
-            labels, amps = [], []
-            if "left" in tremor_data:
-                labels.append("Left Hand")
-                amps.append(tremor_data["left"]["amplitude"])
-            if "right" in tremor_data:
-                labels.append("Right Hand")
-                amps.append(tremor_data["right"]["amplitude"])
-            plt.subplot(1, 3, 2)
+            # Tremor Amplitude Plot
+            amps = [tremor_data[hand]["amplitude"] for hand in labels]
+            plt.subplot(1, 2, 2)
             plt.bar(labels, amps, color=['blue', 'orange'])
             plt.ylabel("Amplitude (px)")
             plt.title("Tremor Amplitude")
 
-        # Tremor Asymmetry Plot (if both hands are present)
-        if asymmetry_score is not None:
-            plt.subplot(1, 3, 3)
-            plt.bar(["Asymmetry"], [asymmetry_score], color='red')
-            plt.ylabel("Hz Difference")
-            plt.title("Tremor Asymmetry")
+            plt.tight_layout()
 
-        plt.tight_layout()
-        plt.show()
+            # Define save path
+            plot_filename = os.path.join(self.data_dir, f"tremor_plot_{timestamp}.png")
+            
+            # Save the plot
+            plt.savefig(plot_filename)
+            plt.close()  # Close the plot to prevent display
+            
+            print(f"Plot saved to {plot_filename}")
+
 
 def main():
-    # Create and run the resting tremor detector for 30 seconds,
-    # with data saved in the "tremor_results" folder.
-    detector = parkCamTremor(tremor_duration=30)
+    # Create the tremor detector and run continuously
+    detector = parkCamTremor(save_interval=30)
     detector.run()
-
-    # Compute metrics, save data to CSV, and plot results (all within the class)
-    detector.process_and_save()
 
 if __name__ == "__main__":
     main()

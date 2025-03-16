@@ -71,18 +71,26 @@ class parkCamGait:
             stride_symmetry = 0
 
         # Save gait metrics to CSV
-        metrics_filename = os.path.join(self.data_dir, f"gait_metrics_{int(self.interval_start_time)}.csv")
-        with open(metrics_filename, mode="w", newline="") as file:
+        # metrics_filename = os.path.join(self.data_dir, f"gait_metrics_{int(self.interval_start_time)}.csv")
+        metrics_filename = os.path.join(self.data_dir, f"gait_metrics.csv")
+        file_exists = os.path.isfile(metrics_filename) and os.path.getsize(metrics_filename) > 0
+
+        with open(metrics_filename, mode="a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Total Steps", "Cadence (steps/min)", "Stride Symmetry Ratio", "Shuffling Count"])
+            if not file_exists:
+                writer.writerow(["Total Steps", "Cadence (steps/min)", "Stride Symmetry Ratio", "Shuffling Count"])
             writer.writerow([self.step_count, cadence, stride_symmetry, self.shuffling_count])
         print(f"Gait metrics saved to: {metrics_filename}")
 
         # Save foot trajectory data to CSV
-        trajectory_filename = os.path.join(self.data_dir, f"foot_trajectory_{int(self.interval_start_time)}.csv")
-        with open(trajectory_filename, mode="w", newline="") as file:
+        # trajectory_filename = os.path.join(self.data_dir, f"foot_trajectory_{int(self.interval_start_time)}.csv")
+        trajectory_filename = os.path.join(self.data_dir, f"foot_trajectory.csv")
+        file_exists = os.path.isfile(trajectory_filename) and os.path.getsize(trajectory_filename) > 0
+        
+        with open(trajectory_filename, mode="a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Time (s)", "Left Foot X", "Left Foot Y", "Right Foot X", "Right Foot Y"])
+            if not file_exists:
+                writer.writerow(["Time (s)", "Left Foot X", "Left Foot Y", "Right Foot X", "Right Foot Y"])
             for i in range(len(self.timestamps)):
                 writer.writerow([self.timestamps[i], self.left_foot_x[i], self.left_foot_y[i],
                                  self.right_foot_x[i], self.right_foot_y[i]])

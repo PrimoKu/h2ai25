@@ -7,7 +7,7 @@ from datetime import datetime
 import time
 import os
 
-class ContinuousPosturalStabilityMonitor:
+class parkCamPostrue:
     def __init__(self, monitoring_interval=30, pixel_to_cm=0.5, trail_length=30,
                  camera_index=0, data_dir="data_storage/postural_data",
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
@@ -79,8 +79,11 @@ class ContinuousPosturalStabilityMonitor:
 
         # Save CSV file with current timestamp
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        csv_filename = os.path.join(self.data_dir, f"postural_stability_data_{timestamp}.csv")
-        df.to_csv(csv_filename, index=False)
+        csv_filename = os.path.join(self.data_dir, f"postural_stability_data.csv")
+        # Check if the file exists to decide whether to write the header
+        write_header = not os.path.exists(csv_filename)
+        # Append data to the CSV file
+        df.to_csv(csv_filename, mode="a", index=False, header=write_header)
         print(f"Data saved to {csv_filename}")
 
         # Create a plot with three subplots: Sway Distance, Sway Velocity, and Tremor Index
@@ -177,7 +180,7 @@ class ContinuousPosturalStabilityMonitor:
 
 def main():
     # Create an instance with a monitoring interval of 60 seconds (modifiable)
-    monitor = ContinuousPosturalStabilityMonitor(monitoring_interval=30)
+    monitor = parkCamPostrue(monitoring_interval=30)
     monitor.run()
 
 if __name__ == "__main__":
