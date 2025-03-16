@@ -102,46 +102,53 @@ This will:
 ```
 multi_agent_server/
 │── core/
-│   │── parkAgents/                      # Analysis agents
-│   │   │── agent_manager.py             # Manages all agent threads
-│   │   │── blood_pressure_analyst.py    # Blood pressure monitoring agent
-│   │   │── heart_rate_analyst.py        # Heart rate monitoring agent
-│   │   │── motor_skill_analyst.py       # Motor skills monitoring agent
-│   │   │── parkinson_analyst.py         # Meta-analysis agent
-│   │   │── speech_analyst.py            # Speech pattern analysis agent
-│   │── parkCam/                         # Camera-based monitoring systems
-│   │   │── assessment/                  # Task-based assessments
-│   │   │   │── draw.py                  # Drawing task analysis
-│   │   │   │── flip.py                  # Object manipulation assessment
-│   │   │   │── tap.py                   # Finger tapping test
-│   │   │   │── write.py                 # Handwriting analysis
-│   │   │── monitoring/                  # Passive monitoring systems
-│   │   │   │── gait.py                  # Walking pattern analysis
-│   │   │   │── posture.py               # Posture assessment
-│   │   │   │── tremor.py                # Tremor detection
-│   │   │   │── write.py                 # Real-time writing analysis
-│   │   │── parkMedicine.py              # Medical recommendations
-│   │── parkCognitive/                   # Cognitive assessment tools
-│   │   │── cognitive_assessment.py      # Cognitive function evaluation
-│   │── parkMood/                        # Emotional state analysis
-│   │   │── AudioDoctor.py               # Audio-based health assessment
-│   │   │── AudioEmotionRecognizer.py    # Emotion detection from voice
-│   │── parkSensors/                     # Physical sensors
-│   │   │── blood_pressure_sensor.py     # Blood pressure monitoring
-│   │   │── heart_rate_sensor.py         # Heart rate monitoring
-│── data_storage/                        # Data storage directory
-│   │── gait_data.csv                    # Walking pattern data
-│   │── postural_data.csv                # Posture assessment data
-│   │── tremor_data.csv                  # Tremor measurements
-│   │── blood_pressure_data.csv          # Blood pressure readings
-│   │── heart_rate_data.csv              # Heart rate measurements
-│   │── speech_data.csv                  # Speech pattern data
-│   │── analyzed_blood_pressure.json     # Blood pressure analysis results
-│   │── analyzed_heart_rate.json         # Heart rate analysis results
-│   │── analyzed_motor_skill.json        # Motor skill analysis results
-│   │── parkinson_analysis.json          # Comprehensive Parkinson's assessment
-│── config.py                            # Configuration settings
-│── server.py                            # Main entry point
+│   │── parkAgents/                    # LLM-based analysis agents
+│   │   │── agent_manager.py           # Orchestrates all agents
+│   │   │── blood_pressure_analyst.py  # Blood pressure monitoring
+│   │   │── heart_rate_analyst.py      # Heart rate analysis
+│   │   │── motor_skill_analyst.py     # Motor function analysis
+│   │   │── parkinson_analyst.py       # Meta-analysis agent
+│   │   │── speech_analyst.py          # Speech pattern analysis
+│   │   │── h2ai-lm/                   # H2AI LLM integration
+│   │       │── h2ai_agents.py         # H2AI agent implementations
+│   │       │── h2ai_openai_client.py  # OpenAI compatibility layer
+│   │       │── h2ai_retrival.py       # Knowledge retrieval
+│   │── parkCam/                       # Computer vision components
+│   │   │── assessment/                # Task-based assessments
+│   │   │   │── draw.py                # Drawing task analysis
+│   │   │   │── flip.py                # Card flipping test
+│   │   │   │── tap.py                 # Tapping test analysis
+│   │   │   │── write.py               # Writing analysis
+│   │   │── monitoring/                # Continuous monitoring
+│   │       │── gait.py                # Walking pattern analysis
+│   │       │── posture.py             # Posture analysis
+│   │       │── tremor.py              # Tremor detection
+│   │       │── write.py               # Handwriting analysis
+│   │   │── parkMedicine.py            # Medical context integration
+│   │── parkCognitive/                 # Cognitive assessment
+│   │   │── cognitive_assessment.py    # Cognitive test suite
+│   │── parkMood/                      # Emotional analysis
+│   │   │── AudioDoctor.py             # Audio health analysis
+│   │   │── AudioEmotionRecognizer.py  # Emotion detection from speech
+│   │── parkSensors/                   # Physical sensor modules
+│       │── blood_pressure_sensor.py   # Blood pressure monitoring
+│       │── heart_rate_sensor.py       # Heart rate monitoring
+│── data_storage/                      # Data storage directory
+│   │── gait_data.csv                  # Walking data
+│   │── postural_data.csv              # Posture metrics
+│   │── tremor_data.csv                # Tremor measurements
+│   │── blood_pressure_data.csv        # Blood pressure readings
+│   │── heart_rate_data.csv            # Heart rate data
+│   │── speech_data.csv                # Speech recordings/analysis
+│   │── analyzed_blood_pressure.json   # Agent analysis results
+│   │── analyzed_heart_rate.json       # Agent analysis results
+│   │── analyzed_motor_skill.json      # Agent analysis results
+│   │── parkinson_analysis.json        # Final combined assessment
+│── expert_knowledge/                  # Knowledge base for the system
+│── cognitive_assessment_stand_alone.py # Standalone cognitive test
+│── cognitive_assessment.py            # Integrated cognitive assessment
+│── config.py                          # Configuration settings
+│── server.py                          # Main entry point
 ```
 
 ## System Components
