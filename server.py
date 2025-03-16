@@ -10,8 +10,8 @@ def main():
 
     # Start sensor threads FIRST
     print("Starting sensors...")
-    bp_sensor = BloodPressureSensor(frequency=10)
-    hr_sensor = HeartRateSensor(frequency=10)
+    bp_sensor = BloodPressureSensor(frequency=1)
+    hr_sensor = HeartRateSensor(frequency=1)
     
     bp_sensor.start()
     hr_sensor.start()

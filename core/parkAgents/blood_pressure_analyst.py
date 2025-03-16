@@ -17,7 +17,8 @@ class BloodPressureAgent:
         self._last_analysis_time = None    # Track when we last did an analysis
         self._running = False              # Flag to prevent multiple analyses at once
         
-        # Define the cardiovascular expert persona
+        # Define the cardiovascular expert persona with JSON output format instructions
+        # IMPORTANT: Using double curly braces to escape them for LangChain template
         self.persona = """You are a medical assistant specializing in cardiovascular health with extensive experience in blood pressure monitoring and analysis. 
 
                             Your responsibilities:
@@ -34,7 +35,22 @@ class BloodPressureAgent:
                             - Hypertension Stage 2: Systolic ≥140 or diastolic ≥90
                             - Hypertensive Crisis: Systolic >180 and/or diastolic >120
 
-                            Always maintain a professional, informative tone while making medical information accessible."""
+                            ALERTS SHOULD BE RAISED WHEN:
+                            - Multiple readings show Hypertension Stage 2 levels or higher
+                            - Any reading shows Hypertensive Crisis levels
+                            - A clear pattern of worsening blood pressure is detected over time
+                            - A significant and sudden change in blood pressure readings is observed
+
+                            Always maintain a professional, informative tone while making medical information accessible.
+                            
+                            YOU MUST RESPOND IN THE FOLLOWING JSON FORMAT:
+                            {{
+                                "analysis": "Your detailed analysis text here",
+                                "alert": true or false
+                            }}
+                            
+                            Use true for alert if any alert conditions are met, otherwise use false.
+                            Do not include any text outside of this JSON structure."""
         
         # Set up the chain with persona
         self.prompt = ChatPromptTemplate.from_messages([
@@ -42,6 +58,7 @@ class BloodPressureAgent:
             ("human", "{user_prompt}\n\nData: {data}")
         ])
         
+        # Use string output parser as we'll parse the JSON manually
         self.chain = self.prompt | self.model | StrOutputParser()
     
     def get_data_from_last_minute(self):
@@ -66,12 +83,41 @@ class BloodPressureAgent:
 
         return relevant_data
     
-    def save_analysis_results(self, analysis):
+    def parse_json_response(self, response_text):
+        """Parse the JSON response from the LLM. Handle potential formatting issues."""
+        try:
+            # Find anything that looks like a JSON object in the response
+            import re
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+                result = json.loads(json_str)
+                
+                # Validate the result has the required fields
+                if 'analysis' in result and 'alert' in result:
+                    # Ensure alert is boolean
+                    if isinstance(result['alert'], str):
+                        result['alert'] = result['alert'].lower() == 'true'
+                    return result
+            
+            # If we reach here, either no JSON was found or it was invalid
+            raise ValueError("Response doesn't contain valid JSON with required fields")
+            
+        except Exception as e:
+            print(f"[Blood Pressure Agent] Error parsing JSON response: {str(e)}")
+            # Create a default result with the original text as analysis and default to alert=True for safety
+            return {
+                'analysis': response_text,
+                'alert': True  # Default to alert=True on parsing error for safety
+            }
+    
+    def save_analysis_results(self, result_data):
         """Saves analysis results to JSON file with thread safety."""
         with self.file_lock:  # Ensure only one thread writes at a time
-            result_data = {
+            output_data = {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "analysis": analysis
+                "analysis": result_data.get('analysis', 'No analysis available'),
+                "alert": result_data.get('alert', True)  # Default to True if missing
             }
 
             previous_results = []
@@ -82,12 +128,12 @@ class BloodPressureAgent:
                     except json.JSONDecodeError:
                         pass
 
-            previous_results.append(result_data)
+            previous_results.append(output_data)
 
             with open(config.ANALYZED_BLOOD_PRESSURE_JSON, "w") as f:
                 json.dump(previous_results, f, indent=4)
 
-            timestamp = result_data['timestamp']
+            timestamp = output_data['timestamp']
             print(f"[Blood Pressure Agent] Analysis saved at {timestamp}.")
     
     def analyze(self):
@@ -111,17 +157,23 @@ class BloodPressureAgent:
             analysis_prompt = """Please analyze these blood pressure readings. 
             Identify any patterns, abnormal readings, or concerning trends. 
             Consider both systolic and diastolic values and their relationship. 
-            Provide a thorough assessment of cardiovascular health based on these readings.
-            If appropriate, suggest follow-up actions."""
+            Provide a thorough assessment of cardiovascular health based on the readings.
+            If appropriate, suggest follow-up actions.
+            
+            Remember to return your analysis in the required JSON format with both the analysis text and alert boolean.
+            """
             
             # Run the analysis through the LLM chain
-            analysis = self.chain.invoke({
+            response = self.chain.invoke({
                 "user_prompt": analysis_prompt,
                 "data": json.dumps(data, indent=2)
             })
             
+            # Parse the JSON response
+            result_data = self.parse_json_response(response)
+            
             # Save results
-            self.save_analysis_results(analysis)
+            self.save_analysis_results(result_data)
             
             # Update last analysis time
             self._last_analysis_time = datetime.now()
@@ -129,6 +181,12 @@ class BloodPressureAgent:
             
         except Exception as e:
             print(f"[Blood Pressure Agent] Error during analysis: {str(e)}")
+            # Create default result with error message
+            error_result = {
+                'analysis': f"Error during analysis: {str(e)}",
+                'alert': True  # Default to alert=True on error for safety
+            }
+            self.save_analysis_results(error_result)
         finally:
             # Always reset running flag when done
             self._running = False
