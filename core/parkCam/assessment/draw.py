@@ -4,7 +4,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import time
-import config
+
+import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_dir = os.path.join(current_dir, "../../..")
+sys.path.insert(0, config_dir)
+from config import DATA_STORAGE_PATH
 
 class parkCamDraw:
     def __init__(self, spiral_radius=200, center=(250, 250), step_size=5, sampling_rate=0.02):
@@ -101,7 +107,7 @@ def main():
             "Deviation (pixels)": deviations,
             "Velocity (px/s)": velocities + [None]  # Last velocity entry is None to match length
         })
-        csv_filename = f"{config.DATA_STORAGE_PATH}/spiral_drawing_data_{timestamp}.csv"
+        csv_filename = f"{DATA_STORAGE_PATH}/spiral_drawing_data_{timestamp}.csv"
         df.to_csv(csv_filename, index=False)
         print(f"Data saved to {csv_filename}")
 

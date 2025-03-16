@@ -5,10 +5,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-import config
+
+import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_dir = os.path.join(current_dir, "../../..")
+sys.path.insert(0, config_dir)
+from config import DATA_STORAGE_PATH
 
 class parkCamTap:
-    def __init__(self, tap_threshold=30, min_time_between_taps=0.1,
+    def __init__(self, tap_threshold=60, min_time_between_taps=0.1,
                  detection_confidence=0.5, tracking_confidence=0.5, camera_index=0):
         # Parameters for tap detection
         self.tap_threshold = tap_threshold
@@ -116,7 +122,7 @@ def main():
             "Inter-Tap Interval (s)": inter_tap_intervals,
             "Amplitude (pixels)": distances[:len(tap_times)]
         })
-        csv_filename = f"{config.DATA_STORAGE_PATH}/finger_tap_data_{timestamp}.csv"
+        csv_filename = f"{DATA_STORAGE_PATH}/finger_tap_data_{timestamp}.csv"
         df.to_csv(csv_filename, index=False)
         print(f"Data saved to {csv_filename}")
 

@@ -5,7 +5,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-import config
+
+
+import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_dir = os.path.join(current_dir, "../../..")
+sys.path.insert(0, config_dir)
+from config import DATA_STORAGE_PATH
 
 class parkCamFlip:
     def __init__(self, flip_threshold=20, min_time_between_flips=0.3, 
@@ -130,7 +137,7 @@ def main():
     
     # Save flip data to a CSV file
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    csv_filename = f"{config.DATA_STORAGE_PATH}/hand_flip_data_{timestamp}.csv"
+    csv_filename = f"{DATA_STORAGE_PATH}/hand_flip_data_{timestamp}.csv"
     df.to_csv(csv_filename, index=False)
     print(f"Data saved to {csv_filename}")
 
