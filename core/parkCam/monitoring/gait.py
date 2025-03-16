@@ -13,7 +13,7 @@ sys.path.insert(0, config_dir)
 from config import DATA_STORAGE_PATH
 
 class parkCamGait:
-    def __init__(self, interval_duration=30, data_dir="{DATA_STORAGE_PATH}/gait_data", frame_rate=30,
+    def __init__(self, interval_duration=30, data_dir=f"{DATA_STORAGE_PATH}/gait_data", frame_rate=30,
                  step_threshold=0.05, shuffling_threshold=0.02, camera_index=0):
         """
         Parameters:

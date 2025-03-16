@@ -13,5 +13,10 @@
         "timestamp": "2025-03-15 23:39:02",
         "analysis": "The heart rate data provided shows a normal and stable heart rate within the range of 72-76 BPM. There are no signs of tachycardia or bradycardia. The heart rate variability is also within a normal range, indicating good cardiovascular health. No irregular rhythms or concerning patterns are detected in this data set.",
         "alert": false
+    },
+    {
+        "timestamp": "2025-03-15 23:41:32",
+        "analysis": "The heart rate data provided shows a consistent pattern within the normal range for adults, which is 60-100 beats per minute (BPM). The heart rate varies between 68-72 BPM, which is a healthy range. There are no signs of tachycardia (heart rate above 100 BPM) or bradycardia (heart rate below 60 BPM). The heart rate variability (HRV) is also within a normal range, indicating good cardiovascular health. There are no sudden changes in heart rate or irregular rhythms that would suggest stress or underlying conditions. Therefore, no immediate follow-up actions are necessary based on this data.",
+        "alert": false
     }
 ]

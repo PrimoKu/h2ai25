@@ -8,5 +8,10 @@
         "timestamp": "2025-03-15 23:39:04",
         "analysis": "The gait data shows a consistent pattern in the movement of the left and right foot, with no significant asymmetry or irregularities. However, the tremor data for the right hand shows a high frequency and amplitude, which is a common symptom of Parkinson's disease. The tremor frequency ranges from 12.77 to 16.39 Hz, and the amplitude increases over time, reaching a maximum of 20.25. This pattern of increasing amplitude could indicate a worsening of symptoms. There are no 'on/off' phenomena visible in the provided data. The absence of postural data limits the completeness of this analysis.",
         "alert": true
+    },
+    {
+        "timestamp": "2025-03-15 23:41:34",
+        "analysis": "The gait data shows a consistent pattern of the left foot having a slightly higher x and y position compared to the right foot. This could indicate a slight asymmetry in motor function, which is a common symptom in Parkinson's disease. However, the difference is not significant and could be within normal variation. The tremor data shows a consistent pattern of tremors in the right hand with a frequency around 15 Hz and increasing amplitude over time. This is a clear sign of motor impairment and is strongly suggestive of Parkinson's disease, as tremors in this frequency range are common in this condition. The increasing amplitude could indicate a progression of the disease. There are no 'on/off' phenomena visible in the data. The absence of postural data makes it difficult to assess rigidity or bradykinesia.",
+        "alert": true
     }
 ]
