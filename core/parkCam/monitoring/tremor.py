@@ -8,7 +8,7 @@ import time
 import os
 
 class parkCamTremor:
-    def __init__(self, save_interval=30, camera_index=0,
+    def __init__(self, save_interval=30, camera_index=2,
                  detection_confidence=0.5, tracking_confidence=0.5,
                  data_dir="data_storage/tremor_data"):
         """

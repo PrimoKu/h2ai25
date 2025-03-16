@@ -9,7 +9,7 @@ import os
 
 class parkCamPosture:
     def __init__(self, monitoring_interval=30, pixel_to_cm=0.5, trail_length=30,
-                 camera_index=0, data_dir="data_storage/postural_data",
+                 camera_index=1, data_dir="data_storage/postural_data",
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
         """
         Parameters:
