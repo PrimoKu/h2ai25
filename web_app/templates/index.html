@@ -418,6 +418,317 @@
       font-weight: 400;
       margin: 0;
     }
+    /* Chat Panel Styles */
+    .chat-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .message {
+        max-width: 70%;
+        padding: 15px;
+        border-radius: 20px;
+        position: relative;
+        animation: fadeIn 0.5s ease, slideIn 0.5s ease;
+        margin: 10px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .user-message {
+        background: #003366;
+        color: white;
+        margin-left: auto;
+        animation-name: fadeIn, slideInRight;
+    }
+
+    .agent-message {
+        background: #e9ecef;
+        color: #333;
+        margin-right: auto;
+        animation-name: fadeIn, slideInLeft;
+    }
+
+    .chat-input-container {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #ddd;
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        outline: none;
+    }
+
+    .send-button {
+        padding: 12px 25px;
+        border-radius: 25px;
+        background: #0055a5;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .send-button:hover {
+        background: #003366;
+        transform: translateY(-2px);
+    }
+
+    @keyframes slideInLeft {
+        from { transform: translateX(-20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideInRight {
+        from { transform: translateX(20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .cognitive-panel {
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    }
+
+    .status-header {
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        animation: slideDown 0.5s ease-out;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        background: #28a745;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+    }
+
+    .instruction-box {
+        background: #003366;
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin: auto;
+        max-width: 80%;
+        box-shadow: 0 4px 15px rgba(0,51,102,0.2);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Keep previous message styles but remove input-related CSS */
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+    /* Microphone Animation */
+    .mic-animation-container {
+        position: relative;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 2rem 0;
+    }
+
+    .mic-wrapper {
+        position: relative;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .mic-icon {
+        font-size: 4rem;
+        color: #003366;
+        position: relative;
+        z-index: 1;
+    }
+
+    .mic-pulse {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: rgba(0,85,165,0.1);
+        border-radius: 50%;
+        animation: pulse 2s ease-out infinite;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    @keyframes pulse {
+        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+    }
+
+    /* Enhanced Chat Messages */
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background: linear-gradient(45deg, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    .message {
+        max-width: 70%;
+        padding: 15px 20px;
+        border-radius: 15px;
+        position: relative;
+        animation: messageAppear 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin: 10px 0;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: start;
+        gap: 15px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation-fill-mode: forwards;
+    }
+
+    @keyframes messageAppear {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .user-message {
+        background: linear-gradient(135deg, #003366, #0055a5);
+        color: white;
+        margin-left: auto;
+        flex-direction: row-reverse;
+    }
+
+    .agent-message {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        color: #333;
+        margin-right: auto;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: avatarFloat 3s ease-in-out infinite;
+    }
+
+    .agent-avatar {
+        background: linear-gradient(135deg, #003366, #0055a5);
+    }
+
+    .user-avatar {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+    }
+
+    .avatar i {
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    @keyframes avatarFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    .message-content {
+        flex: 1;
+    }
+
+    .timestamp {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.8);
+        margin-top: 8px;
+        text-align: right;
+    }
+
+    .agent-message .timestamp {
+        color: rgba(0,0,0,0.5);
+    }
+
+    /* Status Animation */
+    .status-indicator {
+        padding: 12px 20px;
+        border-radius: 25px;
+        background: rgba(255,255,255,0.9);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        backdrop-filter: blur(5px);
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        animation: statusSlideIn 1s ease-out;
+    }
+
+    @keyframes statusSlideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 
@@ -454,6 +765,47 @@
   <script>
     let hotInstance = null;
     let currentCSVData = {};
+    let dynamicChart;
+    // Simulate streaming data (replace with actual ZeroMQ integration)
+    let medicineTaken = false; // Track if medicine has been taken
+    let medicineTime = null; // Track the time when medicine was taken
+
+    // Function to simulate medicine intake
+    function simulateMedicineIntake() {
+      const delay = Math.floor(Math.random() * 20000) + 10000; // Random delay between 10-30 seconds
+      setTimeout(() => {
+        medicineTaken = true;
+        medicineTime = new Date(); // Record the time when medicine was taken
+
+        // Add a vertical line and pill icon to the chart
+        dynamicChart.data.datasets.push({
+          type: 'line',
+          label: 'Medicine Taken',
+          data: [{ x: medicineTime, y: 0 }, { x: medicineTime, y: 200 }], // Vertical line
+          borderColor: '#28a745', // Green color for the line
+          borderWidth: 2,
+          borderDash: [5, 5], // Dashed line
+          pointRadius: 0, // No points
+          yAxisID: 'y-left'
+        });
+
+        // Add a pill icon at the top of the vertical line
+        dynamicChart.data.datasets.push({
+          type: 'scatter',
+          label: '',
+          data: [{ x: medicineTime, y: 200 }], // Position at the top of the chart
+          pointStyle: 'image',
+          pointRadius: 10,
+          pointHoverRadius: 10,
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
+          pointBackgroundImage: 'https://cdn-icons-png.flaticon.com/512/3144/3144456.png', // Pill icon URL
+          yAxisID: 'y-left'
+        });
+
+        dynamicChart.update(); // Update the chart
+      }, delay);
+    }
     const itemsPerPage = 50;
 
     async function loadCSV(csvName, timestamp) {
@@ -506,6 +858,7 @@
           contextMenu: true,
           filters: true,
           dropdownMenu: true,
+          stretchH: 'all', // Added: columns auto-scale to fill width
           columns: currentCSVData[csvName].headers.map(() => ({ type: 'text' })),
           autoColumnSize: {
             samplingRatio: 23
@@ -526,7 +879,7 @@
       const files = [
         'analyzed_heart_rate.json',
         'analyzed_blood_pressure.json',
-        'analyzed_motor_functions.json',
+        'analyzed_motor_skill.json',
         'analyzed_speech.json'
       ];
 
@@ -588,7 +941,8 @@
             });
           }
           const entry = mergedMap.get(minuteKey);
-          entry.alerts[index] = item.alert === "true";
+          entry.alerts[index] = (item.alert === true || item.alert === "true");
+          console.log(`Minute ${minuteKey}: Set alert[${index}] to`, entry.alerts[index]);
           entry.analyses[index] = item.analysis;
         });
       });
@@ -598,20 +952,22 @@
       );
     }
 
-    function renderMeasurements(data, filterParams = {}) {
+  function renderMeasurements(data, filterParams = {}) {
       const container = $('.patient-data-panel .measurement-list');
       container.empty();
 
       let counter = 1;
       data.forEach(item => {
+        // Corrected filtering logic
         if (filterParams.alertOnly && !item.alerts.some(a => a)) return;
         if (filterParams.startDate && new Date(item.timestamp) < filterParams.startDate) return;
         if (filterParams.endDate && new Date(item.timestamp) > filterParams.endDate) return;
 
         const alertIcons = [
+        { icon: 'fa-heart', label: 'Heart Rate' },
           { icon: 'fa-heartbeat', label: 'Blood Pressure' },
-          { icon: 'fa-walking', label: 'Motor Functions' },
-          { icon: 'fa-microphone-alt', label: 'Speech' }
+          { icon: 'fa-microphone-alt', label: 'Speech' },
+          { icon: 'fa-walking', label: 'Motor Skill' }
         ];
 
         const measurementItem = $(
@@ -625,9 +981,9 @@
                 ${alertIcons.map((icon, i) => `
                   <i class="fas ${icon.icon} 
                     ${item.alerts[i] ? 'alert-danger' :
-              (item.analyses[i] ? 'alert-success' : 'alert-muted')}" 
+                    (item.analyses[i] ? 'alert-success' : 'alert-muted')}" 
                     title="${icon.label}: ${item.alerts[i] ? 'Alert' :
-              (item.analyses[i] ? 'Normal' : 'No Data')}">
+                    (item.analyses[i] ? 'Normal' : 'No Data')}">
                   </i>
                 `).join('')}
               </div>
@@ -639,6 +995,7 @@
         );
 
         container.append(measurementItem);
+
         // Update measurement click handler
         measurementItem.click(async function () {
           $('.measurement-item').removeClass('selected');
@@ -658,7 +1015,7 @@
               loadCSV('blood_pressure', timestamp),
               loadCSV('heart_rate', timestamp),
               loadCSV('speech', timestamp),
-              loadCSV('motor_functions', timestamp)
+              loadCSV('motor_skill', timestamp)
             ]);
 
             // Check for any successful loads
@@ -693,14 +1050,14 @@
         content: [
           {
             type: 'column',
-            width: 20,
+            width: 18,
             content: [
-              { type: 'component', componentName: 'dashboard', title: 'Dashboard', isClosable: false, height: 27 },
-              { type: 'component', componentName: 'diagnosticTools', title: 'ParkClinic Agent', isClosable: false, height: 40 }
+              { type: 'component', componentName: 'dashboard', title: 'Dashboard', isClosable: false, height: 22 },
+              { type: 'component', componentName: 'patientData', title: 'Patient Data', isClosable: false, height: 40 }
             ]
           },
           { type: 'component', componentName: 'reports', title: 'Reports', width: 38, isClosable: false},
-          { type: 'component', componentName: 'patientData', title: 'Patient Data', width: 24, isClosable: false}
+          { type: 'component', componentName: 'cognitiveTest', title: 'Mini Mental Cognitive Test', width: 17, isClosable: false}
         ]
       }]
     };
@@ -743,7 +1100,7 @@
 
       // Initialize Chart.js dynamic plot with dual y-axes
       var ctx = container.getElement().find('#dynamicPlot')[0].getContext('2d');
-      var dynamicChart = new Chart(ctx, {
+      dynamicChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: [],
@@ -798,27 +1155,38 @@
           animation: false
         }
       });
-
-      // Simulate streaming data (replace with actual ZeroMQ integration)
-      setInterval(function () {
-        let now = new Date();
-        let heartRate = 60 + Math.floor(Math.random() * 40);
-        let bloodPressure = 110 + Math.floor(Math.random() * 30);
-        dynamicChart.data.labels.push(now);
-        dynamicChart.data.datasets[0].data.push(heartRate);
-        dynamicChart.data.datasets[1].data.push(bloodPressure);
-        if (dynamicChart.data.labels.length > 20) {
-          dynamicChart.data.labels.shift();
-          dynamicChart.data.datasets[0].data.shift();
-          dynamicChart.data.datasets[1].data.shift();
-        }
-        dynamicChart.update();
-      }, 2000);
     });
 
     // ParkClinic Agent component (existing example)
-    myLayout.registerComponent('diagnosticTools', function (container, state) {
-      container.getElement().html('<div class="panel-content"><h2>ParkClinic</h2><p>Access advanced diagnostic analysis tools for Parkinson’s disease.</p></div>');
+    myLayout.registerComponent('cognitiveTest', function(container, state) {
+        container.getElement().html(`
+        <div class="cognitive-panel">
+            <div class="status-header">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Real-time Voice Analysis Active</span>
+                </div>
+            </div>
+            
+            <div class="mic-animation-container" id="micAnimation">
+                <div class="mic-wrapper">
+                    <div class="mic-pulse"></div>
+                    <div class="mic-pulse" style="animation-delay: -0.5s"></div>
+                    <div class="avatar agent-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                </div>
+                <div class="instruction-box" style="position: absolute; bottom: -110px;">
+                    <h3 style="margin: 0 0 10px;">Cognitive Assessment Ready</h3>
+                    <p style="font-size: 0.9rem; opacity: 0.9;">Please say "I'm Ready!" To Wake the AI Agent</p>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages" style="display: none;">
+                <!-- Messages will be dynamically added here -->
+            </div>
+        </div>
+        `);
     });
 
     // Patient Data component styled like an email system
@@ -873,7 +1241,7 @@
           <button class="csv-tab filter-button" data-csv="speech">
             <i class="fas fa-microphone-alt"></i> Speech
           </button>
-          <button class="csv-tab filter-button" data-csv="motor_functions">
+          <button class="csv-tab filter-button" data-csv="motor_skill">
             <i class="fas fa-walking"></i> Motor
           </button>
         </div>
@@ -908,7 +1276,36 @@
 
       // Load initial data
       loadPatientData();
+      // Simulate medicine intake when the page loads
+      simulateMedicineIntake();
 
+    // Simulate streaming data
+    setInterval(function () {
+      let now = new Date();
+      let heartRate, bloodPressure;
+
+      if (medicineTaken && now - medicineTime < 60000) {
+        // Simulate the effect of medicine for 1 minute
+        heartRate = 60 + Math.floor(Math.random() * 10); // Lower and more stable heart rate
+        bloodPressure = 100 + Math.floor(Math.random() * 10); // Lower and more stable blood pressure
+      } else {
+        // Normal random values
+        heartRate = 60 + Math.floor(Math.random() * 40);
+        bloodPressure = 110 + Math.floor(Math.random() * 30);
+      }
+
+      dynamicChart.data.labels.push(now);
+      dynamicChart.data.datasets[0].data.push(heartRate);
+      dynamicChart.data.datasets[1].data.push(bloodPressure);
+
+      if (dynamicChart.data.labels.length > 20) {
+        dynamicChart.data.labels.shift();
+        dynamicChart.data.datasets[0].data.shift();
+        dynamicChart.data.datasets[1].data.shift();
+      }
+
+      dynamicChart.update();
+    }, 3000);
       // Filter controls
       $('#applyDates').click(() => {
         currentFilters.startDate = $('#startDate').val() ? new Date($('#startDate').val()) : null;
@@ -941,28 +1338,12 @@
         showCSVData(csvName);
       });
 
-      $('#prevPage').click(() => {
-        const activeTab = $('.csv-tab.active').data('csv');
-        if (currentCSVData[activeTab].currentPage > 1) {
-          currentCSVData[activeTab].currentPage--;
-          updateCSVDisplay(activeTab);
-        }
-      });
-
-      $('#nextPage').click(() => {
-        const activeTab = $('.csv-tab.active').data('csv');
-        const totalPages = Math.ceil(currentCSVData[activeTab].content.length / itemsPerPage);
-        if (currentCSVData[activeTab].currentPage < totalPages) {
-          currentCSVData[activeTab].currentPage++;
-          updateCSVDisplay(activeTab);
-        }
-      });
-
       // Update loadPatientData function
       window.loadPatientData = function () {
         const files = [
+          'analyzed_heart_rate.json',
           'analyzed_blood_pressure.json',
-          'analyzed_motor_functions.json',
+          'analyzed_motor_skill.json',
           'analyzed_speech.json'
         ];
 
@@ -976,6 +1357,60 @@
         });
       }
     });
+    // Add this function right before the pollMessages function
+    function createMessageElement(text, isAgent) {
+      const message = document.createElement('div');
+      message.className = `message ${isAgent ? 'agent-message' : 'user-message'}`;
+      
+      message.innerHTML = `
+          <div class="avatar ${isAgent ? 'agent-avatar' : 'user-avatar'}">
+              <i class="fas ${isAgent ? 'fa-robot' : 'fa-user'}"></i>
+          </div>
+          <div class="message-content">
+              ${text}
+              <div class="timestamp">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+      `;
+      
+      return message;
+  }
+  function pollMessages() {
+    fetch('/api/messages')
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(msg => {
+          // Check if the speaker is 'user' or 'agent'
+          const isAgent = msg.speaker === 'agent';
+          
+          // Pass the correct value to appendMessage
+          // If speaker is 'user', isAgent will be false
+          // If speaker is 'agent', isAgent will be true
+          appendMessage(msg.context, isAgent);
+        });
+      })
+      .catch(error => console.error('Error polling messages:', error));
+  }
+
+  // This function correctly handles isAgent parameter
+  function appendMessage(text, isAgent) {
+    const chatMessages = document.getElementById('chatMessages');
+    const micAnimation = document.getElementById('micAnimation');
+    
+    // Hide mic animation after first message
+    if (micAnimation.style.display !== 'none') {
+        micAnimation.style.display = 'none';
+        chatMessages.style.display = 'flex';
+    }
+    
+    const messageElement = createMessageElement(text, isAgent);
+    chatMessages.appendChild(messageElement);
+    
+    // Auto-scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+    // Poll every 3 seconds for new messages
+    setInterval(pollMessages, 3000);
   </script>
 
 </body>

@@ -11,3 +11,7 @@ librosa
 wave 
 SpeechRecognition
 pocketsphinx
+pyttsx3
+Flask
+flask_cors
+vosk
