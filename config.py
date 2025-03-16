@@ -13,7 +13,7 @@ BLOOD_PRESSURE_CSV = os.path.join(DATA_STORAGE_PATH, "blood_pressure.csv")
 HEART_RATE_CSV = os.path.join(DATA_STORAGE_PATH, "heart_rate.csv")
 MOTOR_SKILLS_CSV = os.path.join(DATA_STORAGE_PATH, "motor_skill.csv")
 SPEECH_DATA_CSV = os.path.join(DATA_STORAGE_PATH, "speech.csv")
-GAIT_CSV = os.path.join(DATA_STORAGE_PATH, "gait_data/gait_metrics.csv")
+GAIT_CSV = os.path.join(DATA_STORAGE_PATH, "gait_data/foot_trajectory.csv")
 POSTURAL_CSV = os.path.join(DATA_STORAGE_PATH, "postural/postural_stability_data.csv")
 TREMOR_CSV = os.path.join(DATA_STORAGE_PATH, "tremor_data/resting_tremor_data.csv")
 
