@@ -7,7 +7,7 @@ import os
 import matplotlib.pyplot as plt
 
 class parkCamGait:
-    def __init__(self, interval_duration=60, data_dir="data_storage/gait_data", frame_rate=30,
+    def __init__(self, interval_duration=30, data_dir="data_storage/gait_data", frame_rate=30,
                  step_threshold=0.05, shuffling_threshold=0.02, camera_index=0):
         """
         Parameters:
@@ -165,7 +165,7 @@ class parkCamGait:
 
 def main():
     # Set monitoring interval to 60 seconds (or any desired duration)
-    monitor = parkCamGait(interval_duration=10)
+    monitor = parkCamGait(interval_duration=30)
     monitor.run()
 
 if __name__ == "__main__":

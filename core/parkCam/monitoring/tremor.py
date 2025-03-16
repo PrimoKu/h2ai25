@@ -203,7 +203,7 @@ class parkCamTremor:
 def main():
     # Create and run the resting tremor detector for 30 seconds,
     # with data saved in the "tremor_results" folder.
-    detector = parkCamTremor(tremor_duration=30, data_dir="tremor_results")
+    detector = parkCamTremor(tremor_duration=30)
     detector.run()
 
     # Compute metrics, save data to CSV, and plot results (all within the class)

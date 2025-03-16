@@ -8,7 +8,7 @@ import time
 import os
 
 class ContinuousPosturalStabilityMonitor:
-    def __init__(self, monitoring_interval=60, pixel_to_cm=0.5, trail_length=30,
+    def __init__(self, monitoring_interval=30, pixel_to_cm=0.5, trail_length=30,
                  camera_index=0, data_dir="data_storage/postural_data",
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
         """
@@ -177,7 +177,7 @@ class ContinuousPosturalStabilityMonitor:
 
 def main():
     # Create an instance with a monitoring interval of 60 seconds (modifiable)
-    monitor = ContinuousPosturalStabilityMonitor(monitoring_interval=60)
+    monitor = ContinuousPosturalStabilityMonitor(monitoring_interval=30)
     monitor.run()
 
 if __name__ == "__main__":
