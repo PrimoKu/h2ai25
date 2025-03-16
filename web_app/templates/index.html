@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>ParkSuite Portal - ParkInsight<sup>&#8482;</sup> Diagnostic Data Platform</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons (integrity attribute removed to avoid hash mismatches) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Golden Layout CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-base.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/css/goldenlayout-light-theme.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js Date Adapter (using date-fns) -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <link href="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/handsontable@12.1.0/dist/handsontable.full.min.js"></script>
+  <style>
+    /* Base Styles */
+    body {
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f4f6f8;
+      overflow: hidden;
+    }
+
+    /* Fancy Animated Top Bar */
+    .header {
+      background: linear-gradient(90deg, #003366, #0055a5);
+      background-size: 200% 200%;
+      animation: gradientShift 10s ease infinite;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1100;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .header .brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header .brand h1 {
+      margin: 0;
+      font-size: 36px;
+      letter-spacing: 2px;
+    }
+
+    .header .brand p {
+      margin: 5px 0 0;
+      font-size: 16px;
+    }
+
+    /* Hamburger Icon */
+    .hamburger-icon {
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .hamburger-icon:hover {
+      color: #ccc;
+    }
+
+    /* Floating Dropdown Menu */
+    #userDropdown {
+      position: absolute;
+      top: 60px;
+      right: 30px;
+      background: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      width: 200px;
+      display: none;
+      z-index: 1200;
+      padding: 10px 0;
+    }
+
+    #userDropdown ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #userDropdown ul li {
+      padding: 12px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #userDropdown ul li:hover {
+      background: #f0f0f0;
+    }
+
+    /* Golden Layout Container */
+    #layoutContainer {
+      width: 100vw;
+      height: calc(100vh - 80px);
+    }
+
+    /* Panel Styling */
+    .panel-content {
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+      background: #fff;
+      border-radius: 4px;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .lm_item {
+      border-radius: 6px !important;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Status Bar Styling (used in Dashboard) */
+    .status-bar {
+      background: #fff;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .status-icons {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .status-item i {
+      font-size: 32px;
+      color: gray;
+      /* default inactive color */
+    }
+
+    .status-item.active i {
+      color: #28a745;
+      /* green indicates active/connected */
+    }
+
+    .status-item span {
+      font-size: 12px;
+      display: block;
+      margin-top: 5px;
+      color: #333;
+    }
+
+    /* Dynamic Plot Container */
+    .dynamic-plot-container {
+      margin-top: 20px;
+    }
+
+    /* Patient Data Panel Styles */
+    .patient-data-panel .filter-bar {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 10px;
+    }
+
+    .patient-data-panel .measurement-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .patient-data-panel .measurement-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .patient-data-panel .measurement-header {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .patient-data-panel .measurement-metrics i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .patient-data-panel .measurement-timestamp {
+      font-size: 12px;
+      color: #999;
+      white-space: nowrap;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .date-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      width: 100%;
+    }
+
+    .date-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 120px;
+      font-size: 14px;
+      background: #f8f9fa;
+      cursor: pointer;
+    }
+
+    .date-input:hover {
+      border-color: #0055a5;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .button-group .filter-button {
+      flex: 1;
+      /* Makes buttons equally share available width */
+    }
+
+    /* Optional: Adjust button alignment */
+    .button-group {
+      justify-content: space-between;
+    }
+
+    .filter-button {
+      padding: 8px 20px;
+      background: #0055a5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-button:hover {
+      background: #003366;
+      transform: translateY(-1px);
+    }
+
+    .alert-filter {
+      background: #dc3545;
+      padding: 8px 15px;
+    }
+
+    .alert-filter.active {
+      background: #28a745;
+    }
+
+    .measurement-item.has-alert {
+      background: #fff5f5;
+      border-left: 4px solid #dc3545;
+    }
+
+    .icon-gray {
+      color: #ddd !important;
+    }
+
+    .alert-danger {
+      color: #dc3545 !important;
+      /* Red for alerts */
+    }
+
+    .alert-success {
+      color: #28a745 !important;
+      /* Green for normal readings */
+    }
+
+    .alert-muted {
+      color: #6c757d !important;
+      /* Gray for missing data */
+    }
+
+    /* Measurement Item States */
+    .measurement-item {
+      transition: all 0.2s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .measurement-item:hover {
+      background-color: #f8f9fa;
+      transform: translateX(2px);
+    }
+
+    .measurement-item.has-alert {
+      border-left-color: #dc3545;
+      background-color: #fff5f5;
+    }
+
+    .measurement-item.has-alert .measurement-name {
+      color: #dc3545;
+    }
+
+    /* Timestamp Styling */
+    .measurement-timestamp {
+      font-size: 0.85rem;
+      color: #6c757d;
+      letter-spacing: 0.5px;
+    }
+
+    /* Metric Icons */
+    .measurement-metrics i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .measurement-metrics i:hover {
+      transform: scale(1.2);
+      z-index: 1;
+    }
+
+    .measurement-item.selected {
+      background-color: #e3f2fd !important;
+      border-left: 4px solid #2196f3 !important;
+    }
+
+    .csv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .csv-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px !important;
+      transition: all 0.3s ease;
+    }
+
+    .csv-tab.active {
+      background: #003366 !important;
+      border-color: #003366 !important;
+      box-shadow: 0 2px 8px rgba(0, 51, 102, 0.3);
+    }
+
+    /* Handsontable styling */
+    .handsontable {
+      font-size: 13px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Default message styling */
+    .default-message {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .default-message i {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #003366;
+    }
+
+    .default-message h3 {
+      font-weight: 400;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top Bar -->
+  <div class="header">
+    <div class="brand">
+      <h1>ParkSuite</h1>
+      <p>ParkInsight&#8482; - Parkinson Patient’s Data Diagnostic Platform</p>
+    </div>
+    <div class="hamburger-icon" id="hamburgerIcon">&#9776;</div>
+  </div>
+
+  <!-- Floating Dropdown User Menu -->
+  <div id="userDropdown">
+    <ul>
+      <li><strong>Hi, H2AI</strong></li>
+      <hr>
+      <li>Dashboard</li>
+      <li>Profile</li>
+      <li>Settings</li>
+      <li style="color: red;">Logout</li>
+    </ul>
+  </div>
+
+  <!-- Golden Layout Container -->
+  <div id="layoutContainer"></div>
+
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Golden Layout JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/golden-layout/1.5.9/goldenlayout.min.js"></script>
+  <script>
+    let hotInstance = null;
+    let currentCSVData = {};
+    const itemsPerPage = 50;
+
+    async function loadCSV(csvName, timestamp) {
+      try {
+        const csvPath = `data_storage/${csvName}.csv`;
+        const response = await fetch(csvPath);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const data = await response.text();
+        if (!data.trim()) throw new Error('Empty CSV file');
+
+        const rows = data.split('\n').filter(row => row.trim() !== '');
+        if (rows.length < 1) throw new Error('No valid data in CSV');
+
+        currentCSVData[csvName] = {
+          headers: rows[0].split(','),
+          content: rows.slice(1).map(row => row.split(','))
+        };
+
+        return true;
+      } catch (error) {
+        console.error(`Error loading ${csvName}:`, error);
+        currentCSVData[csvName] = {
+          headers: ['Error'],
+          content: [[`Failed to load ${csvName} data`]]
+        };
+        return false;
+      }
+    }
+
+    function showCSVData(csvName) {
+      if (!currentCSVData[csvName]) {
+        console.error('No data available for', csvName);
+        return;
+      }
+
+      try {
+        if (hotInstance) hotInstance.destroy();
+
+        hotInstance = new Handsontable(document.getElementById('hot-container'), {
+          data: currentCSVData[csvName].content,
+          colHeaders: currentCSVData[csvName].headers,
+          rowHeaders: true,
+          height: '100%',
+          width: '100%',
+          licenseKey: 'non-commercial-and-evaluation',
+          readOnly: true,
+          manualRowResize: true,
+          manualColumnResize: true,
+          contextMenu: true,
+          filters: true,
+          dropdownMenu: true,
+          columns: currentCSVData[csvName].headers.map(() => ({ type: 'text' })),
+          autoColumnSize: {
+            samplingRatio: 23
+          }
+        });
+      } catch (error) {
+        console.error('Error rendering table:', error);
+        $('#hot-container').html(`<div class="error">Error displaying data: ${error.message}</div>`);
+      }
+    }
+
+    function updatePaginationInfo(csvName) {
+      const totalPages = Math.ceil(currentCSVData[csvName].content.length / itemsPerPage);
+      $('#pageInfo').text(`Page ${currentCSVData[csvName].currentPage} of ${totalPages}`);
+    }
+
+    function loadPatientData() {
+      const files = [
+        'analyzed_heart_rate.json',
+        'analyzed_blood_pressure.json',
+        'analyzed_motor_functions.json',
+        'analyzed_speech.json'
+      ];
+
+      // Change to use relative path without parent directory
+      const promises = files.map(file =>
+        fetch(`data_storage/${file}`) // Remove leading slash
+          .then(response => {
+            if (!response.ok) throw new Error(`Failed to load ${file}`);
+            return response.json();
+          })
+          .catch(error => {
+            console.error(error);
+            return null;
+          })
+      );
+
+      // Process all files when they're loaded
+      Promise.all(promises)
+        .then(results => {
+          // Filter out any null results from failed requests
+          const validResults = results.filter(result => result !== null);
+
+          if (validResults.length > 0) {
+            const mergedData = mergeData(validResults);
+            renderMeasurements(mergedData);
+          } else {
+            console.error("No valid data files could be loaded");
+          }
+        });
+    }
+
+    function mergeData(dataArrays) {
+      const mergedMap = new Map();
+
+      dataArrays.forEach((data, index) => {
+        // First group each dataset by minute
+        const minuteMap = new Map();
+        data.forEach(item => {
+          const timestamp = new Date(item.timestamp);
+          const minuteKey = new Date(
+            timestamp.getFullYear(),
+            timestamp.getMonth(),
+            timestamp.getDate(),
+            timestamp.getHours(),
+            timestamp.getMinutes()
+          ).getTime();
+
+          // Keep last entry in each minute
+          minuteMap.set(minuteKey, item);
+        });
+
+        // Process grouped data
+        Array.from(minuteMap.entries()).forEach(([minuteKey, item]) => {
+          if (!mergedMap.has(minuteKey)) {
+            mergedMap.set(minuteKey, {
+              timestamp: new Date(minuteKey),
+              alerts: [false, false, false],
+              analyses: ['', '', '']
+            });
+          }
+          const entry = mergedMap.get(minuteKey);
+          entry.alerts[index] = item.alert === "true";
+          entry.analyses[index] = item.analysis;
+        });
+      });
+
+      return Array.from(mergedMap.values()).sort((a, b) =>
+        b.timestamp - a.timestamp
+      );
+    }
+
+    function renderMeasurements(data, filterParams = {}) {
+      const container = $('.patient-data-panel .measurement-list');
+      container.empty();
+
+      let counter = 1;
+      data.forEach(item => {
+        if (filterParams.alertOnly && !item.alerts.some(a => a)) return;
+        if (filterParams.startDate && new Date(item.timestamp) < filterParams.startDate) return;
+        if (filterParams.endDate && new Date(item.timestamp) > filterParams.endDate) return;
+
+        const alertIcons = [
+          { icon: 'fa-heartbeat', label: 'Blood Pressure' },
+          { icon: 'fa-walking', label: 'Motor Functions' },
+          { icon: 'fa-microphone-alt', label: 'Speech' }
+        ];
+
+        const measurementItem = $(
+          `<li class="measurement-item ${item.alerts.some(a => a) ? 'has-alert' : ''}" 
+            data-timestamp="${item.timestamp.toISOString()}">
+            <div class="measurement-header">
+              <span class="measurement-name" style="font-weight: bold;">
+                ${item.alerts.some(a => a) ? '! ' : ''}${item.timestamp.toISOString().slice(0, 16).replace('T', ' ')}
+              </span>
+              <div class="measurement-metrics" style="margin-top: 5px;">
+                ${alertIcons.map((icon, i) => `
+                  <i class="fas ${icon.icon} 
+                    ${item.alerts[i] ? 'alert-danger' :
+              (item.analyses[i] ? 'alert-success' : 'alert-muted')}" 
+                    title="${icon.label}: ${item.alerts[i] ? 'Alert' :
+              (item.analyses[i] ? 'Normal' : 'No Data')}">
+                  </i>
+                `).join('')}
+              </div>
+            </div>
+            <div class="measurement-timestamp">
+              ${new Date(item.timestamp).toLocaleString()}
+            </div>
+          </li>`
+        );
+
+        container.append(measurementItem);
+        // Update measurement click handler
+        measurementItem.click(async function () {
+          $('.measurement-item').removeClass('selected');
+          $(this).addClass('selected');
+
+          $('#reportsDefault').hide();
+          $('#csvViewer').show();
+
+          try {
+            const timestamp = item.timestamp;
+
+            // Show loading state
+            $('#hot-container').html('<div class="loading">Loading data...</div>');
+
+            // Load all CSVs
+            const loadResults = await Promise.allSettled([
+              loadCSV('blood_pressure', timestamp),
+              loadCSV('heart_rate', timestamp),
+              loadCSV('speech', timestamp),
+              loadCSV('motor_functions', timestamp)
+            ]);
+
+            // Check for any successful loads
+            const hasValidData = loadResults.some(result => result.value);
+            if (!hasValidData) throw new Error('All CSV loads failed');
+
+            // Default to heart rate and activate its tab
+            $('.csv-tab').removeClass('active');
+            $('.csv-tab[data-csv="heart_rate"]').addClass('active');
+            showCSVData('heart_rate');
+          } catch (error) {
+            console.error('Error loading CSVs:', error);
+            $('#hot-container').html(`<div class="error">Error loading data: ${error.message}</div>`);
+          }
+        });
+      });
+    }
+    // Toggle Floating Dropdown Menu
+    $('#hamburgerIcon').on('click', function () {
+      $('#userDropdown').toggle();
+    });
+    // Close menu when clicking outside
+    $(document).on('click', function (event) {
+      if (!$(event.target).closest('#hamburgerIcon, #userDropdown').length) {
+        $('#userDropdown').hide();
+      }
+    });
+    // Golden Layout Configuration
+    var config = {
+      content: [{
+        type: 'row',
+        content: [
+          {
+            type: 'column',
+            width: 20,
+            content: [
+              { type: 'component', componentName: 'dashboard', title: 'Dashboard', isClosable: false, height: 27 },
+              { type: 'component', componentName: 'diagnosticTools', title: 'ParkClinic Agent', isClosable: false, height: 40 }
+            ]
+          },
+          { type: 'component', componentName: 'reports', title: 'Reports', width: 38, isClosable: false},
+          { type: 'component', componentName: 'patientData', title: 'Patient Data', width: 24, isClosable: false}
+        ]
+      }]
+    };
+
+    var myLayout = new GoldenLayout(config, $('#layoutContainer'));
+
+    // Dashboard component with Status Bar and Dynamic Plot
+    myLayout.registerComponent('dashboard', function (container, state) {
+      container.getElement().html(`
+        <div class="panel-content">
+          <div class="status-bar">
+            <ul class="status-icons">
+              <li class="status-item active">
+                <i class="fas fa-clock"></i>
+                <span>Wearable</span>
+              </li>
+              <li class="status-item active">
+                <i class="fas fa-heartbeat"></i>
+                <span>BP Device</span>
+              </li>
+              <li class="status-item active">
+                <i class="fas fa-microphone"></i>
+                <span>Mic</span>
+              </li>
+              <li class="status-item active">
+                <i class="fas fa-video"></i>
+                <span>Camera</span>
+              </li>
+              <li class="status-item">
+                <i class="fas fa-vr-cardboard"></i>
+                <span>VR/AR</span>
+              </li>
+            </ul>
+          </div>
+          <div class="dynamic-plot-container">
+            <canvas id="dynamicPlot" width="400" height="200"></canvas>
+          </div>
+        </div>
+      `);
+
+      // Initialize Chart.js dynamic plot with dual y-axes
+      var ctx = container.getElement().find('#dynamicPlot')[0].getContext('2d');
+      var dynamicChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Heart Rate',
+            data: [],
+            borderColor: '#ff0000',
+            backgroundColor: '#ff0000',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y-left'
+          }, {
+            label: 'Blood Pressure',
+            data: [],
+            borderColor: '#0000ff',
+            backgroundColor: '#0000ff',
+            borderWidth: 2,
+            fill: false,
+            yAxisID: 'y-right'
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'rect',
+                boxWidth: 12,
+                boxHeight: 8,
+                font: { size: 12 }
+              }
+            }
+          },
+          scales: {
+            'y-left': {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: 'Heart Rate (bpm)' }
+            },
+            'y-right': {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: 'Blood Pressure (mmHg)' },
+              grid: { drawOnChartArea: false }
+            },
+            x: {
+              type: 'time',
+              time: { unit: 'second', displayFormats: { second: 'HH:mm:ss' } },
+              title: { display: true, text: 'Time' }
+            }
+          },
+          animation: false
+        }
+      });
+
+      // Simulate streaming data (replace with actual ZeroMQ integration)
+      setInterval(function () {
+        let now = new Date();
+        let heartRate = 60 + Math.floor(Math.random() * 40);
+        let bloodPressure = 110 + Math.floor(Math.random() * 30);
+        dynamicChart.data.labels.push(now);
+        dynamicChart.data.datasets[0].data.push(heartRate);
+        dynamicChart.data.datasets[1].data.push(bloodPressure);
+        if (dynamicChart.data.labels.length > 20) {
+          dynamicChart.data.labels.shift();
+          dynamicChart.data.datasets[0].data.shift();
+          dynamicChart.data.datasets[1].data.shift();
+        }
+        dynamicChart.update();
+      }, 2000);
+    });
+
+    // ParkClinic Agent component (existing example)
+    myLayout.registerComponent('diagnosticTools', function (container, state) {
+      container.getElement().html('<div class="panel-content"><h2>ParkClinic</h2><p>Access advanced diagnostic analysis tools for Parkinson’s disease.</p></div>');
+    });
+
+    // Patient Data component styled like an email system
+    myLayout.registerComponent('patientData', function (container, state) {
+      container.getElement().html(`
+      <div class="panel-content patient-data-panel">
+        <div class="filter-bar">
+          <!-- Date inputs on their own line -->
+          <div class="date-filter">
+            <input type="text" id="startDate" class="date-input" placeholder="Start">
+            <span>-</span>
+            <input type="text" id="endDate" class="date-input" placeholder="End">
+          </div>
+          
+          <!-- Buttons grouped together on their own line -->
+          <div class="button-group">
+            <button class="filter-button" id="applyDates">
+              <i class="fas fa-calendar-check"></i>
+              Apply
+            </button>
+            <button class="filter-button alert-filter" id="alertFilter">
+              <i class="fas fa-bell"></i>
+              Alerts Only
+            </button>
+            <button class="filter-button" id="clearFilters" style="background: #6c757d;">
+              <i class="fas fa-times"></i>
+              Clear Filters
+            </button>
+          </div>
+        </div>
+        <ul class="measurement-list"></ul>
+      </div>
+      `);
+    });
+
+    // Reports component (existing example)
+    myLayout.registerComponent('reports', function (container, state) {
+      container.getElement().html(`
+    <div class="panel-content">
+      <div id="reportsDefault" class="default-message">
+        <i class="fas fa-mouse-pointer"></i>
+        <h3>Select A Time Slot in Patient Data Panel To View Raw Measurements and AI Agent Analysis</h3>
+      </div>
+      <div id="csvViewer" style="display: none; height: 100%;">
+        <div class="csv-grid">
+          <button class="csv-tab filter-button" data-csv="heart_rate">
+            <i class="fas fa-heartbeat"></i> Heart Rate
+          </button>
+          <button class="csv-tab filter-button" data-csv="blood_pressure">
+            <i class="fas fa-tint"></i> Blood Pressure
+          </button>
+          <button class="csv-tab filter-button" data-csv="speech">
+            <i class="fas fa-microphone-alt"></i> Speech
+          </button>
+          <button class="csv-tab filter-button" data-csv="motor_functions">
+            <i class="fas fa-walking"></i> Motor
+          </button>
+        </div>
+        <div id="hot-container" style="height: calc(100% - 60px); margin-top: 15px;"></div>
+      </div>
+    </div>
+  `);
+    });
+
+    myLayout.init();
+
+    $(window).resize(function () {
+      myLayout.updateSize();
+    });
+    $(document).ready(() => {
+      // Initialize date pickers
+      const dateConfig = {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        minuteIncrement: 1
+      };
+
+      flatpickr("#startDate", { ...dateConfig, maxDate: new Date() });
+      flatpickr("#endDate", { ...dateConfig, maxDate: new Date() });
+
+      let currentFilters = {
+        startDate: null,
+        endDate: null,
+        alertOnly: false
+      };
+
+      // Load initial data
+      loadPatientData();
+
+      // Filter controls
+      $('#applyDates').click(() => {
+        currentFilters.startDate = $('#startDate').val() ? new Date($('#startDate').val()) : null;
+        currentFilters.endDate = $('#endDate').val() ? new Date($('#endDate').val()) : null;
+        loadPatientData();
+      });
+
+      $('#alertFilter').click(function () {
+        $(this).toggleClass('active');
+        currentFilters.alertOnly = $(this).hasClass('active');
+        loadPatientData();
+      });
+
+      $('#clearFilters').click(function () {
+        $('#startDate').val('');
+        $('#endDate').val('');
+        $('#alertFilter').removeClass('active');
+        currentFilters = {
+          startDate: null,
+          endDate: null,
+          alertOnly: false
+        };
+        loadPatientData();
+      });
+
+      $('#csvViewer').on('click', '.csv-tab', function () {
+        const csvName = $(this).data('csv');
+        $('.csv-tab').removeClass('active');
+        $(this).addClass('active');
+        showCSVData(csvName);
+      });
+
+      $('#prevPage').click(() => {
+        const activeTab = $('.csv-tab.active').data('csv');
+        if (currentCSVData[activeTab].currentPage > 1) {
+          currentCSVData[activeTab].currentPage--;
+          updateCSVDisplay(activeTab);
+        }
+      });
+
+      $('#nextPage').click(() => {
+        const activeTab = $('.csv-tab.active').data('csv');
+        const totalPages = Math.ceil(currentCSVData[activeTab].content.length / itemsPerPage);
+        if (currentCSVData[activeTab].currentPage < totalPages) {
+          currentCSVData[activeTab].currentPage++;
+          updateCSVDisplay(activeTab);
+        }
+      });
+
+      // Update loadPatientData function
+      window.loadPatientData = function () {
+        const files = [
+          'analyzed_blood_pressure.json',
+          'analyzed_motor_functions.json',
+          'analyzed_speech.json'
+        ];
+
+        Promise.all(files.map(file =>
+          // Change to use correct relative path
+          $.getJSON(`data_storage/${file}`) // Remove ../
+            .fail(() => console.error(`Failed to load ${file}`))
+        )).then(results => {
+          const mergedData = mergeData(results);
+          renderMeasurements(mergedData, currentFilters);
+        });
+      }
+    });
+  </script>
+
+</body>
+
+</html>
