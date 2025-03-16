@@ -3,8 +3,7 @@ sys.path.append("core/parkAgents/h2ai-lm")
 from h2ai_retrieval import relevent_retrieve
 from h2ai_agents import h2aiCharacter, h2aiAgent, h2aiContextAgent
 from h2ai_openai_client import h2aiOpenAIClient
-import socket
-from threading import Thread
+
 
 def run_pipeline():
     file_path = "expert_knowledge/expert_knowledge.json.bm25_with_keys.pkl"
@@ -21,41 +20,14 @@ def run_pipeline():
 
     return a, c, a_summarizer, bm25_pkl_expert
 
-def tcp_server(host='127.0.0.1', port=65432):
-    """
-    Simple TCP server that listens for incoming connections and messages.
-    """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        server_socket.bind((host, port))
-        server_socket.listen()
-        print(f"TCP server listening on {host}:{port}")
-
-        while True:
-            conn, addr = server_socket.accept()
-            with conn:
-                print(f"Connected by {addr}")
-                while True:
-                    data = conn.recv(1024)
-                    if not data:
-                        break
-                    msg = data.decode('utf-8')
-                    yield msg  # Yield the received message
-
 def main():
     """
     Test class
     """
     a, c, a_summarizer, bm25_pkl_expert = run_pipeline()
     r = a.chat("I am a Parkinson's disease patient. You are my doctor. Please give me a Mini-Mental State Examination (MMSE) or Montreal Cognitive Assessment (MoCA). Choose one examination. One question a time and don't say anything else until all questions are answered. Wait for me to ask you to start. Give me the evaluation results once all questions are ready. Don't worry, it is just a test.", save_conv=True)
-    
-    # Start the TCP server in a separate thread
-    tcp_thread = Thread(target=tcp_server)
-    tcp_thread.daemon = True
-    tcp_thread.start()
-
-    # Get messages from the TCP server and pass them to the chat function
-    for msg in tcp_server():
-        r = a.chat(msg, save_conv=True)
+    while True:
+        r = a.chat(input("Please enter your prompt: "), save_conv=True)
         rich.print(r)
     
 if __name__ == '__main__':
