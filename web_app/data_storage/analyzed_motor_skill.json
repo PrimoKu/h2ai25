@@ -3,5 +3,10 @@
         "timestamp": "2025-03-15 21:15:11",
         "analysis": "The provided data shows a series of tremor measurements for the right hand. The tremor frequency varies between approximately 12.83 and 16.87, while the tremor amplitude ranges from 1.0 to 19.24. This variability in both frequency and amplitude suggests a possible 'on/off' phenomenon, which is characteristic of advancing Parkinson's disease. The tremors are only recorded for the right hand, indicating a clear asymmetry in motor function, another common sign of Parkinson's. However, without data for grip strength, gait, and postural stability, a comprehensive assessment of motor function is not possible. It is recommended to collect and analyze these additional measurements for a more accurate diagnosis.",
         "alert": true
+    },
+    {
+        "timestamp": "2025-03-15 23:39:04",
+        "analysis": "The gait data shows a consistent pattern in the movement of the left and right foot, with no significant asymmetry or irregularities. However, the tremor data for the right hand shows a high frequency and amplitude, which is a common symptom of Parkinson's disease. The tremor frequency ranges from 12.77 to 16.39 Hz, and the amplitude increases over time, reaching a maximum of 20.25. This pattern of increasing amplitude could indicate a worsening of symptoms. There are no 'on/off' phenomena visible in the provided data. The absence of postural data limits the completeness of this analysis.",
+        "alert": true
     }
 ]

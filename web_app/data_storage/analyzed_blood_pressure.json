@@ -8,5 +8,10 @@
         "timestamp": "2025-03-15 21:15:22",
         "analysis": "The blood pressure readings provided show a consistent pattern of slightly elevated systolic pressure, ranging from 115 to 125 mmHg, which is above the normal range of ~120 mmHg. The diastolic pressure, on the other hand, fluctuates between 77 and 83 mmHg, which is within or slightly above the normal range of ~80 mmHg. There are no instances of Hypertension Stage 1, Stage 2, or Hypertensive Crisis levels. However, the consistently elevated systolic pressure and occasional elevated diastolic pressure may indicate a trend towards Hypertension Stage 1. It is recommended to monitor the blood pressure regularly and consider lifestyle modifications to manage blood pressure, such as a healthy diet, regular exercise, and stress management. If the trend continues, medical consultation may be necessary.",
         "alert": false
+    },
+    {
+        "timestamp": "2025-03-15 23:39:06",
+        "analysis": "The blood pressure readings provided show a slight fluctuation in both systolic and diastolic values. The systolic values range from 115 to 125 mmHg, and the diastolic values range from 77 to 82 mmHg. The first two readings are within the normal range, while the third and fourth readings indicate elevated blood pressure due to the systolic value being slightly above 120 mmHg. The last two readings return to the normal range. There is no clear pattern of worsening blood pressure over time, and no readings reach Hypertension Stage 1 or higher. However, the slight fluctuation in blood pressure could be due to various factors such as stress, physical activity, or diet. It would be beneficial to continue monitoring blood pressure regularly to ensure it remains within the normal range.",
+        "alert": false
     }
 ]

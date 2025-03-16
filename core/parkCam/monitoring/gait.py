@@ -5,10 +5,15 @@ import time
 import csv
 import os
 import matplotlib.pyplot as plt
-import config
+import sys 
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_dir = os.path.join(current_dir, "../../..")
+sys.path.insert(0, config_dir)
+from config import DATA_STORAGE_PATH
 
 class parkCamGait:
-    def __init__(self, interval_duration=30, data_dir="{config.DATA_STORAGE_PATH}/gait_data", frame_rate=30,
+    def __init__(self, interval_duration=30, data_dir="{DATA_STORAGE_PATH}/gait_data", frame_rate=30,
                  step_threshold=0.05, shuffling_threshold=0.02, camera_index=0):
         """
         Parameters:

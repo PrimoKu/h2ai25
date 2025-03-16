@@ -6,11 +6,16 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import time
 import os
-import config
+import sys 
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_dir = os.path.join(current_dir, "../../..")
+sys.path.insert(0, config_dir)
+from config import DATA_STORAGE_PATH
 
 class parkCamPosture:
     def __init__(self, monitoring_interval=30, pixel_to_cm=0.5, trail_length=30,
-                 camera_index=1, data_dir="{config.DATA_STORAGE_PATH}/postural_data",
+                 camera_index=1, data_dir="{DATA_STORAGE_PATH}/postural_data",
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
         """
         Parameters:
