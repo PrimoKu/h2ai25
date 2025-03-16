@@ -8,7 +8,7 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Paths for sensor data storage
-DATA_STORAGE_PATH = "data_storage/"
+DATA_STORAGE_PATH = "web_app/data_storage/"
 BLOOD_PRESSURE_CSV = os.path.join(DATA_STORAGE_PATH, "blood_pressure.csv")
 HEART_RATE_CSV = os.path.join(DATA_STORAGE_PATH, "heart_rate.csv")
 MOTOR_SKILLS_CSV = os.path.join(DATA_STORAGE_PATH, "motor_skill.csv")

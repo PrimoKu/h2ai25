@@ -1,10 +1,20 @@
-# Parkinson's Disease Monitoring System
+# Multi-Agent Parkinson's Disease Monitoring System
 
-A comprehensive multi-agent LLM-powered system for monitoring and analyzing health metrics to detect potential Parkinson's disease indicators.
+An advanced multi-agent system leveraging LLMs and computer vision to monitor, analyze, and detect potential Parkinson's disease indicators with an integrated web application for data visualization.
 
 ## Overview
 
-This project implements a real-time health monitoring system using multiple specialized AI agents to analyze different health metrics and synthesize the data to identify potential signs of Parkinson's disease. The system combines physiological sensors, cognitive assessments, mood analysis, and camera-based monitoring to provide a holistic analysis of Parkinson's disease indicators.
+This project implements a sophisticated health monitoring system that combines multiple specialized AI agents, computer vision analysis, and sensor data to identify potential signs of Parkinson's disease. The system includes a web application for visualizing all data assessments and analyses.
+
+Key features:
+
+- **Physiological metrics**: Blood pressure, heart rate monitoring
+- **Motor functions**: Gait, posture, tremor, writing, grip strength, coordination
+- **Cognitive assessment**: Memory, cognition, processing speed
+- **Speech and mood analysis**: Speech patterns and emotional indicators
+- **Web-based visualization**: Interactive dashboard for all monitoring and analysis results
+
+Each domain is analyzed by specialized AI agents powered by OpenAI's GPT-4 or H2AI's language models, with a meta-analysis agent that synthesizes all inputs to provide comprehensive Parkinson's disease assessment.
 
 ## System Architecture
 
@@ -56,17 +66,18 @@ This project implements a real-time health monitoring system using multiple spec
 ### Prerequisites
 
 - Python 3.8+
-- OpenAI API key
+- OpenAI API key (for GPT-4 agents)
+- H2AI API credentials (if using H2AI language models)
 - Required Python packages (see `requirements.txt`)
-- Camera setup for parkCam features
-- Audio recording capabilities for speech analysis
+- Webcam or camera for computer vision features
+- Sensors for physiological measurements
 
 ### Installation
 
 1. Clone the repository
    ```
-   git clone https://github.com/yourusername/multi_agent_server.git
-   cd multi_agent_server
+   git clone https://github.com/yourusername/multi-agent-parkinsons-system.git
+   cd multi-agent-parkinsons-system
    ```
 
 2. Install dependencies
@@ -75,27 +86,56 @@ This project implements a real-time health monitoring system using multiple spec
    ```
 
 3. Configure the `config.py` file with your API keys and file paths
+   ```python
+   # API Keys
+   OPENAI_API_KEY = "your-openai-api-key"
+   H2AI_API_KEY = "your-h2ai-api-key"  # if applicable
+   
+   # File Paths (already set up with correct project structure)
+   BLOOD_PRESSURE_CSV = "web_app/data_storage/blood_pressure_data.csv"
+   HEART_RATE_CSV = "web_app/data_storage/heart_rate_data.csv"
+   # Additional file paths...
+   
+   ANALYZED_BLOOD_PRESSURE_JSON = "web_app/data_storage/analyzed_blood_pressure.json"
+   ANALYZED_HEART_RATE_JSON = "web_app/data_storage/analyzed_heart_rate.json"
+   # Additional analysis file paths...
+   ```
 
-4. Ensure data storage directory exists
-   ```
-   mkdir -p data_storage
-   ```
+4. Ensure you have access to required hardware (sensors, camera)
 
 ## Usage
 
-Start the system by running:
+### Starting the Monitoring System
+
+Start the main system by running:
 
 ```
 python server.py
 ```
 
 This will:
-1. Initialize all sensor modules
-2. Start the camera monitoring systems
-3. Launch cognitive assessment tools
-4. Enable audio emotion recognition
-5. Start all analysis agents
-6. Begin comprehensive Parkinson's disease monitoring
+1. Initialize all sensor and data collection modules
+2. Start computer vision monitoring if enabled
+3. Launch all agent threads for continuous analysis
+4. Begin cognitive and speech assessment when triggered
+5. Keep the server running until manual termination (Ctrl+C)
+
+### Starting the Web Application
+
+Start the web interface by running:
+
+```
+cd web_app
+python app.py
+```
+
+This will launch a web server that provides:
+1. Real-time visualization of all sensor data
+2. Interactive dashboard for viewing analysis results
+3. Historical trends and patterns
+4. Comprehensive Parkinson's assessment reports
+
+Access the web interface by navigating to `http://localhost:5000` in your browser (or the port specified in the app configuration).
 
 ## Project Structure
 
@@ -133,90 +173,114 @@ multi_agent_server/
 │   │── parkSensors/                   # Physical sensor modules
 │       │── blood_pressure_sensor.py   # Blood pressure monitoring
 │       │── heart_rate_sensor.py       # Heart rate monitoring
-│── data_storage/                      # Data storage directory
-│   │── gait_data.csv                  # Walking data
-│   │── postural_data.csv              # Posture metrics
-│   │── tremor_data.csv                # Tremor measurements
-│   │── blood_pressure_data.csv        # Blood pressure readings
-│   │── heart_rate_data.csv            # Heart rate data
-│   │── speech_data.csv                # Speech recordings/analysis
-│   │── analyzed_blood_pressure.json   # Agent analysis results
-│   │── analyzed_heart_rate.json       # Agent analysis results
-│   │── analyzed_motor_skill.json      # Agent analysis results
-│   │── parkinson_analysis.json        # Final combined assessment
 │── expert_knowledge/                  # Knowledge base for the system
+│── web_app/                           # Web application for visualization
+│   │── data_storage/                  # Data and analysis storage
+│   │   │── gait_data.csv              # Walking data
+│   │   │── postural_data.csv          # Posture metrics
+│   │   │── tremor_data.csv            # Tremor measurements
+│   │   │── blood_pressure_data.csv    # Blood pressure readings
+│   │   │── heart_rate_data.csv        # Heart rate data
+│   │   │── speech_data.csv            # Speech recordings/analysis
+│   │   │── analyzed_blood_pressure.json # Agent analysis results
+│   │   │── analyzed_heart_rate.json   # Agent analysis results
+│   │   │── analyzed_motor_skill.json  # Agent analysis results
+│   │   │── parkinson_analysis.json    # Final combined assessment
+│   │── app.py                         # Web application entry point
 │── cognitive_assessment_stand_alone.py # Standalone cognitive test
 │── cognitive_assessment.py            # Integrated cognitive assessment
 │── config.py                          # Configuration settings
-│── server.py                          # Main entry point
+│── server.py                          # Main system entry point
 ```
 
-## System Components
+## Key Components
 
-### parkSensors
-Physical sensors for monitoring physiological metrics including:
-- Blood pressure monitoring
-- Heart rate tracking
+### 1. Sensor Data Collection
+The `parkSensors` module interfaces with physical sensors to collect physiological data like blood pressure and heart rate.
 
-### parkCam
-Camera-based monitoring and assessment tools:
-- **Assessment**: Active tasks like drawing, object manipulation, finger tapping and handwriting
-- **Monitoring**: Passive observation of gait, posture, tremor and writing
+### 2. Computer Vision Analysis
+The `parkCam` module uses computer vision to:
+- Monitor motor symptoms (tremor, gait abnormalities)
+- Assess performance on structured tasks (drawing, writing, card flipping)
+- Track posture and movement patterns
 
-### parkCognitive
-Tools for assessing cognitive function, which can be affected in Parkinson's disease.
+### 3. Cognitive Assessment
+The `parkCognitive` module provides tests to evaluate cognitive functions often affected by Parkinson's disease.
 
-### parkMood
-Audio analysis tools for:
-- Speech pattern analysis for Parkinson's indicators
-- Emotional state assessment through voice analysis
+### 4. Mood and Speech Analysis
+The `parkMood` module analyzes speech patterns and emotional indicators that may signal neurological changes.
 
-### parkAgents
-LLM-powered analysis agents:
-- Domain-specific agents for analyzing individual health metrics
-- Parkinson Analyst for integrating all data into a comprehensive assessment
+### 5. LLM-Powered Agents
+The `parkAgents` module contains specialized LLM agents that analyze domain-specific data and provide expert assessments.
 
-## How It Works
+### 6. Meta-Analysis
+The `parkinson_analyst.py` integrates all agent outputs to provide a comprehensive Parkinson's disease assessment.
 
-1. **Data Collection**: Multiple sensors and systems collect physiological, motor, cognitive, and emotional data
-2. **Domain Analysis**: Specialized agents analyze specific health domains
-3. **Visual Assessment**: Camera systems monitor movement patterns and perform specific task assessments
-4. **Audio Analysis**: Voice patterns and emotional indicators are monitored
-5. **Meta Analysis**: The Parkinson Analyst synthesizes all inputs to detect potential Parkinson's disease indicators
-6. **Data Storage**: Raw data and analysis results are stored for historical tracking and review
+### 7. Web Application
+The `web_app` directory contains a web application that:
+- Visualizes all collected data in real-time
+- Displays analysis results from individual agents
+- Presents comprehensive assessment reports
+- Tracks historical trends and changes over time
+- Provides an intuitive interface for healthcare providers and researchers
+
+## Web Application Features
+
+The web application serves as a comprehensive dashboard for monitoring and assessment:
+
+- **Real-time Visualization**: Live displays of sensor data and computer vision analysis
+- **Interactive Dashboards**: Customizable views for different data types and analyses
+- **Historical Data**: Trend analysis and progression tracking over time
+- **Assessment Reports**: Detailed reports from each specialized agent
+- **Integrated Analysis**: Comprehensive Parkinson's disease assessment
+- **Alert System**: Notifications for significant changes or concerning patterns
+- **Export Functionality**: Export data and reports for medical records or research
+
+## Extending the System
+
+### Adding New Sensors
+1. Create a new sensor module in `core/parkSensors/`
+2. Update `config.py` with new file paths
+3. Modify relevant analysis agents to use the new data
+4. Add visualization component to the web application
+
+### Adding New Computer Vision Features
+1. Add new monitoring or assessment scripts to the appropriate `parkCam` subdirectory
+2. Integrate with existing agent frameworks or create a new agent for the data
+3. Update the web application to display the new analysis
+
+### Adding New Agent Types
+1. Create a new agent in `core/parkAgents/`
+2. Add the agent to `agent_manager.py`
+3. Update `parkinson_analyst.py` to incorporate the new analysis
+4. Add corresponding visualization to the web application
 
 ## Technical Details
 
-- **Multithreading**: Components run concurrently in separate threads
-- **LangChain Integration**: Utilizes LangChain's agent framework for structured LLM interactions
-- **GPT-4**: Analyses are performed using OpenAI's GPT-4 model
-- **Computer Vision**: Camera-based monitoring uses computer vision techniques
-- **Audio Processing**: Speech and emotion analysis leverages audio processing libraries
-
-## Healthcare Applications
-
-This system can assist healthcare providers by:
-- Providing continuous monitoring between clinical visits
-- Detecting subtle changes in patient condition
-- Enabling remote assessment of Parkinson's symptoms
-- Supporting early intervention through early detection
-- Creating objective data-based progression tracking
+- **Multi-Modal Analysis**: Combines text, audio, and visual data for comprehensive assessment
+- **LLM Integration**: Uses OpenAI's GPT-4 and/or H2AI language models for analysis
+- **Multithreaded Architecture**: Parallel processing of different data streams and analyses
+- **Scheduled Monitoring**: Regular assessment cycles with configurable frequencies
+- **Computer Vision**: Real-time monitoring of physical symptoms and task performance
+- **Web Framework**: Flask/Dash-based web application with interactive visualizations
+- **Data Storage**: Structured CSV and JSON storage with optional database integration
 
 ## Limitations and Considerations
 
-- **Not a Diagnostic Tool**: This system is designed to support, not replace, medical professionals
-- **Data Privacy**: Health data should be handled according to HIPAA and other relevant regulations
-- **API Costs**: Running multiple GPT-4 instances can be expensive for continuous monitoring
-- **Technical Requirements**: Camera and audio setup may be complex for home deployment
-- **Validation Required**: System outputs should be validated in clinical settings
+- **Not a Medical Diagnostic Tool**: This system is for research and monitoring purposes only and should not replace professional medical diagnosis
+- **Privacy Concerns**: Handles sensitive health data requiring appropriate privacy measures
+- **Resource Intensity**: The full system requires significant computational resources
+- **API Costs**: Using multiple LLM instances can incur substantial API costs
+- **Sensor Accuracy**: Results are dependent on the quality and accuracy of input sensors
 
-## Future Enhancements
+## Future Development
 
-- Integration with wearable devices
-- Mobile app for patient self-monitoring
-- Medication tracking and adherence monitoring
-- Machine learning models for personalized baseline establishment
+- Integration with wearable devices for continuous monitoring
+- Mobile application for remote assessment and monitoring
+- Enhanced machine learning models for improved symptom detection
 - Integration with electronic health records
+- Personalized treatment recommendation engine
+- Expanded visualization capabilities in the web application
 
 ## License
 
@@ -224,11 +288,11 @@ This system can assist healthcare providers by:
 
 ## Contributors
 
-- Yihao Liu
-- Yu-Chun Ku
-- Tong Mu
+- [Your Name](https://github.com/yourusername)
 
 ## Acknowledgements
 
 - OpenAI for GPT-4
+- H2AI for language models (if applicable)
 - LangChain for the agent framework
+- Medical advisors and Parkinson's disease specialists for domain expertise
