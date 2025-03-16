@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import time
+import config
 
 class parkCamWrite:
     def __init__(self, canvas_width=800, canvas_height=600,
@@ -117,7 +118,7 @@ def main():
     if sentences_data:
         df = pd.DataFrame(sentences_data)
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        csv_filename = f"data_storage/handwriting_data_{timestamp}.csv"
+        csv_filename = f"{config.DATA_STORAGE_PATH}/handwriting_data_{timestamp}.csv"
         df.to_csv(csv_filename, index=False)
         print(f"Data saved to {csv_filename}")
 

@@ -21,6 +21,14 @@ def run_pipeline():
 
     return a, c, a_summarizer, bm25_pkl_expert
 
+def send_response(addr, response):
+    """
+    Send a response back to the client using port 65433.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+        client_socket.connect((addr[0], 65433))  # Connect to the client's address on port 65433
+        client_socket.sendall(response.encode('utf-8'))
+
 def tcp_server(host='127.0.0.1', port=65432):
     """
     Simple TCP server that listens for incoming connections and messages.
@@ -39,7 +47,7 @@ def tcp_server(host='127.0.0.1', port=65432):
                     if not data:
                         break
                     msg = data.decode('utf-8')
-                    yield msg  # Yield the received message
+                    yield msg, addr  # Yield the received message and the client's address
 
 def main():
     """
@@ -54,9 +62,11 @@ def main():
     tcp_thread.start()
 
     # Get messages from the TCP server and pass them to the chat function
-    for msg in tcp_server():
+    for msg, addr in tcp_server():
         r = a.chat(msg, save_conv=True)
         rich.print(r)
+        # Send the response back to the client
+        send_response(addr, r)
     
 if __name__ == '__main__':
     main()

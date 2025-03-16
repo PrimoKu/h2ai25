@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
+import config
 
 class parkCamTap:
     def __init__(self, tap_threshold=30, min_time_between_taps=0.1,
@@ -115,7 +116,7 @@ def main():
             "Inter-Tap Interval (s)": inter_tap_intervals,
             "Amplitude (pixels)": distances[:len(tap_times)]
         })
-        csv_filename = f"data_storage/finger_tap_data_{timestamp}.csv"
+        csv_filename = f"{config.DATA_STORAGE_PATH}/finger_tap_data_{timestamp}.csv"
         df.to_csv(csv_filename, index=False)
         print(f"Data saved to {csv_filename}")
 

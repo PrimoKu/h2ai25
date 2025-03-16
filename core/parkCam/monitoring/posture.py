@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import time
 import os
+import config
 
 class parkCamPosture:
     def __init__(self, monitoring_interval=30, pixel_to_cm=0.5, trail_length=30,
-                 camera_index=1, data_dir="data_storage/postural_data",
+                 camera_index=1, data_dir="{config.DATA_STORAGE_PATH}/postural_data",
                  min_detection_confidence=0.5, min_tracking_confidence=0.5):
         """
         Parameters:
