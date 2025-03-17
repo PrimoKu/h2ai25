@@ -282,17 +282,18 @@ The web application serves as a comprehensive dashboard for monitoring and asses
 - Personalized treatment recommendation engine
 - Expanded visualization capabilities in the web application
 
-## License
+<!-- ## License
 
-[MIT License](LICENSE)
+[MIT License](LICENSE) -->
 
 ## Contributors
 
-- [Your Name](https://github.com/yourusername)
+- Yihao Liu
+- Yu-Chun Ku
+- Tong Mu
 
 ## Acknowledgements
 
-- OpenAI for GPT-4
-- H2AI for language models (if applicable)
+- OpenAI for GPT-4o
 - LangChain for the agent framework
 - Medical advisors and Parkinson's disease specialists for domain expertise
