@@ -14,7 +14,7 @@ Key features:
 - **Speech and mood analysis**: Speech patterns and emotional indicators
 - **Web-based visualization**: Interactive dashboard for all monitoring and analysis results
 
-Each domain is analyzed by specialized AI agents powered by OpenAI's GPT-4 or H2AI's language models, with a meta-analysis agent that synthesizes all inputs to provide comprehensive Parkinson's disease assessment.
+Each domain is analyzed by specialized AI agents powered by OpenAI's GPT-4o language models, with a meta-analysis agent that synthesizes all inputs to provide comprehensive Parkinson's disease assessment.
 
 ## System Architecture
 
@@ -67,7 +67,6 @@ Each domain is analyzed by specialized AI agents powered by OpenAI's GPT-4 or H2
 
 - Python 3.8+
 - OpenAI API key (for GPT-4 agents)
-- H2AI API credentials (if using H2AI language models)
 - Required Python packages (see `requirements.txt`)
 - Webcam or camera for computer vision features
 - Sensors for physiological measurements
@@ -89,7 +88,6 @@ Each domain is analyzed by specialized AI agents powered by OpenAI's GPT-4 or H2
    ```python
    # API Keys
    OPENAI_API_KEY = "your-openai-api-key"
-   H2AI_API_KEY = "your-h2ai-api-key"  # if applicable
    
    # File Paths (already set up with correct project structure)
    BLOOD_PRESSURE_CSV = "web_app/data_storage/blood_pressure_data.csv"
@@ -149,8 +147,8 @@ multi_agent_server/
 │   │   │── motor_skill_analyst.py     # Motor function analysis
 │   │   │── parkinson_analyst.py       # Meta-analysis agent
 │   │   │── speech_analyst.py          # Speech pattern analysis
-│   │   │── h2ai-lm/                   # H2AI LLM integration
-│   │       │── h2ai_agents.py         # H2AI agent implementations
+│   │   │── h2ai-lm/                   # LLM integration
+│   │       │── h2ai_agents.py         # Agent implementations
 │   │       │── h2ai_openai_client.py  # OpenAI compatibility layer
 │   │       │── h2ai_retrival.py       # Knowledge retrieval
 │   │── parkCam/                       # Computer vision components
@@ -258,7 +256,7 @@ The web application serves as a comprehensive dashboard for monitoring and asses
 ## Technical Details
 
 - **Multi-Modal Analysis**: Combines text, audio, and visual data for comprehensive assessment
-- **LLM Integration**: Uses OpenAI's GPT-4 and/or H2AI language models for analysis
+- **LLM Integration**: Uses OpenAI's GPT-4o language models for analysis
 - **Multithreaded Architecture**: Parallel processing of different data streams and analyses
 - **Scheduled Monitoring**: Regular assessment cycles with configurable frequencies
 - **Computer Vision**: Real-time monitoring of physical symptoms and task performance
