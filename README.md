@@ -75,8 +75,8 @@ Each domain is analyzed by specialized AI agents powered by OpenAI's GPT-4o lang
 
 1. Clone the repository
    ```
-   git clone https://github.com/yourusername/multi-agent-parkinsons-system.git
-   cd multi-agent-parkinsons-system
+   git clone git@github.com:PrimoKu/h2ai25.git
+   cd h2ai25
    ```
 
 2. Install dependencies
